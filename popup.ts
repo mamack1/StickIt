@@ -1,20 +1,22 @@
-document.getElementById("create-note")?.addEventListener("click", () => {
-	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-		if (tabs[0].id) {
-			chrome.scripting.executeScript({
-				target: { tabId: tabs[0].id },
-				func: () => {
-					const note = {
-						id: new Date().toISOString(),
-						content: "",
-						x: 100,
-						y: 100,
-					};
-					chrome.runtime.sendMessage({ action: "saveNote", note: note }, () => {
-						location.reload();
-					});
-				},
+document.addEventListener("DOMContentLoaded", () => {
+	const createNote = document.getElementById("create-note");
+
+	if (createNote) {
+		createNote.addEventListener("click", () => {
+			chrome.windows.getCurrent({ populate: true }, (currentWindow) => {
+				const left = currentWindow.left! + (currentWindow.width! - 300);
+				const top = currentWindow.top;
+
+				chrome.windows.create({
+					url: chrome.runtime.getURL("floating.html"),
+					type: "popup",
+					width: 400,
+					height: 300,
+					left: left,
+					top: top,
+				});
+				console.log("OPENED");
 			});
-		}
-	});
+		});
+	}
 });

@@ -1,22 +1,17 @@
 "use strict";
-var _a;
-(_a = document.getElementById("create-note")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0].id) {
-            chrome.scripting.executeScript({
-                target: { tabId: tabs[0].id },
-                func: () => {
-                    const note = {
-                        id: new Date().toISOString(),
-                        content: "",
-                        x: 100,
-                        y: 100,
-                    };
-                    chrome.runtime.sendMessage({ action: "saveNote", note: note }, () => {
-                        location.reload();
-                    });
-                },
+document.addEventListener("DOMContentLoaded", () => {
+    const createNote = document.getElementById("create-note");
+    if (createNote) {
+        createNote.addEventListener("click", () => {
+            chrome.windows.create({
+                url: chrome.runtime.getURL("floating.html"),
+                type: "popup",
+                width: 400,
+                height: 300,
+                left: 10,
+                top: 10,
             });
-        }
-    });
+            console.log("OPENED");
+        });
+    }
 });

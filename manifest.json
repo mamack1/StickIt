@@ -8,7 +8,7 @@
 		"48": "icon.png",
 		"128": "icon.png"
 	},
-	"permissions": ["storage", "activeTab"],
+	"permissions": ["storage", "activeTab", "scripting", "windows"],
 	"action": {
 		"default_icon": {
 			"16": "icon.png",

@@ -1,21 +1,20 @@
 {
   "manifest_version": 3,
   "name": "StickIt",
-  "description": "StickIt Notes for the webrowser",
+  "description": "StickIt Notes for the browser",
   "version": "1.0",
-  "icons":
-{
+  "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
-},
-"action": {
+  },
+  "action": {
     "default_icon": {
-        "16": "icon.png",
-        "48": "icon.png",
-        "128": "icon.png"
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
     },
-    "default_title":"StickIt",
-    "default_popup": "popup.html"
+    "default_title": "StickIt",
+    "default_popup": "pages/popup.html"
   }
 }

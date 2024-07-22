@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				const top = currentWindow.top;
 
 				chrome.windows.create({
-					url: chrome.runtime.getURL("floating.html"),
+					url: chrome.runtime.getURL("note.html"),
 					type: "popup",
 					width: 400,
 					height: 300,

@@ -13,17 +13,16 @@ body {
     height: 100px;
     opacity: 0.8;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fall 5s linear infinite; /* Faster fall and infinite loop */
-    transform-origin: center;
+    animation: fall 5s linear infinite;
 }
 
 @keyframes fall {
     0% {
-        transform: translateY(-100px) rotate(0deg); /* Start just above the viewport */
+        transform: translateY(-100px) rotate(0deg);
         opacity: 1;
     }
     100% {
-        transform: translateY(calc(100vh + 100px)) rotate(360deg); /* End just below the viewport */
-        opacity: 0.9;
+        transform: translateY(calc(600px)) rotate(360deg);
+        opacity: 0.8;
     }
 }

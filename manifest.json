@@ -16,7 +16,7 @@
 			"128": "icon.png"
 		},
 		"default_title": "StickIt",
-		"default_popup": "popup.html"
+		"default_popup": "pages/popup.html"
 	},
 	"background": {
 		"service_worker": "background.js"

@@ -3,10 +3,8 @@ body {
     overflow: hidden;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
+    position: relative; /* Ensure notes stay within the body */
 }
 
 .note {
@@ -14,47 +12,18 @@ body {
     width: 100px;
     height: 100px;
     opacity: 0.8;
-    transform: rotate(-15deg);
-    animation: fall linear infinite;
-}
-
-.note:nth-child(1) {
-    background-color: #FFFF00;
-    animation-duration: 4s;
-}
-
-.note:nth-child(2) {
-    background-color: #00EFFF;
-    animation-duration: 5s;
-}
-
-.note:nth-child(3) {
-    background-color: #FF00CC;
-    animation-duration: 6s;
-}
-
-.note:nth-child(4) {
-    background-color: #FF4E4E;
-    animation-duration: 7s;
-}
-
-.note:nth-child(5) {
-    background-color: #FFA05A;
-    animation-duration: 8s;
-}
-
-.note:nth-child(6) {
-    background-color: #FFF2D4;
-    animation-duration: 9s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fall 5s linear infinite; /* Faster fall and infinite loop */
+    transform-origin: center;
 }
 
 @keyframes fall {
     0% {
-        transform: translateY(-100vh) rotate(0deg);
+        transform: translateY(-100px) rotate(0deg); /* Start just above the viewport */
         opacity: 1;
     }
     100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0.5;
+        transform: translateY(calc(100vh + 100px)) rotate(360deg); /* End just below the viewport */
+        opacity: 0.9;
     }
 }

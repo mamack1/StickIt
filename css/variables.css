@@ -1,11 +1,20 @@
 :root{
     --yellow:#F9E900;
+    --heightpop:600px
 }
 body {
     width: 360px;
-    height: 700px;
+    max-height: var(--heightpop) !important;
+    height: var(--heightpop);
     background-color: var(--yellow);
     display: flex;
     opacity: none;
     overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    background-color: var(--yellow);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    position: relative; /* Ensure notes stay within the body */
+
 }

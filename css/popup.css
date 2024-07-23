@@ -1,21 +1,46 @@
-body {
-    background-color: #f0f0f0;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    position: relative; /* Ensure notes stay within the body */
-}
+
 
 .note {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 180px;
+    height: 180px;
     opacity: 0.8;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fall 5s linear infinite;
-    margin-top: -100px;
+    animation: fall 3s linear ;
+    margin-top: -200px;
+    padding: 0px;
+    margin-bottom: 0px;
     left: 0; /* Default value, will be overridden by JavaScript */
+}
+#sp_bot{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 360px;
+    animation: rise 5s ;
+    animation-fill-mode: forwards;
+    animation-delay:5s;
+opacity: 0;
+    /* width: max-content; */
+}
+@keyframes rise {
+    0% {
+        opacity: 0;
+        transform: scaleY(1);
+        transform-origin: bottom;
+    }
+    50%{
+        opacity: 0;
+        transform: scaleY(0.2);
+        transform-origin: bottom;
+
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
+        transform-origin: bottom;
+
+    }
 }
 
 @keyframes fall {
@@ -23,7 +48,13 @@ body {
         transform: translateX(0) translateY(-200px) rotate(0deg);
         opacity: 1;
     }
+    90%{
+        opacity: 1;
+
+    }
     100% {
-        transform: translateX(calc(-50% + 50px)) translateY(690px) rotate(360deg);
+        transform: translateX(calc(-50% + 50px)) translateY(640px) rotate(360deg);
+        opacity: 0;
+
     }
 }

@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
      
         
         // Add random delay and duration for each note
-        note.style.animationDelay = `${Math.random() * 5}s`;
-        note.style.animationDuration = `${Math.random() * 15 + 5}s`; // Duration between 5s and 10s
+        note.style.animationDelay = `${Math.random() * 4}s`;
+        note.style.animationDuration = `${5}s`; // Duration between 5s and 10s
     }
 });
 

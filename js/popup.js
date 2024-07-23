@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(note);
         
         // Randomize starting horizontal position
-        const randomX = Math.random() * 100; // Full width
+        const randomX = Math.random() * 150; // Full width
         note.style.left = `${randomX}%`;
      
         

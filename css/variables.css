@@ -6,4 +6,6 @@ body {
     height: 700px;
     background-color: var(--yellow);
     display: flex;
+    opacity: none;
+    overflow-x: hidden !important;
 }

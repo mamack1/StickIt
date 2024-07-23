@@ -7,8 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
         note.style.backgroundColor = getRandomColor();
         document.body.appendChild(note);
         
-        // Add random delay for each note
+        // Randomize starting horizontal position
+        const randomX = Math.random() * 100; // Full width
+        note.style.left = `${randomX}%`;
+     
+        
+        // Add random delay and duration for each note
         note.style.animationDelay = `${Math.random() * 5}s`;
+        note.style.animationDuration = `${Math.random() * 15 + 5}s`; // Duration between 5s and 10s
     }
 });
 

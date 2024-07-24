@@ -1,12 +1,13 @@
 :root{
     --yellow:#F9E900;
-    --heightpop:600px
+    --heightpop:600px;
+    --notesDuration:3s;
+    --spBotDuration:5s;
 }
 body {
     width: 360px;
     max-height: var(--heightpop) !important;
     height: var(--heightpop);
-    background-color: var(--yellow);
     display: flex;
     opacity: none;
     overflow-x: hidden !important;
@@ -17,4 +18,7 @@ body {
     padding: 0;
     position: relative; /* Ensure notes stay within the body */
 
+}
+button{
+    cursor: pointer;
 }

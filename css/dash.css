@@ -69,6 +69,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
+    
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow here */
 }
 .dashStickSquare {
@@ -76,6 +77,9 @@
     height: 100%;
     box-shadow: none;
     background-color: #ddd; /* Default background color */
+    outline: none;
+    border: none;
+    cursor: pointer;
 }
 .dashRowTwo{
     display: flex;

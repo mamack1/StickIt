@@ -1,9 +1,24 @@
 :root{
     --yellow:#F9E900;
+    --heightpop:600px;
+    --notesDuration:3s;
+    --spBotDuration:5s;
 }
 body {
     width: 360px;
-    height: 700px;
-    background-color: var(--yellow);
+    max-height: var(--heightpop) !important;
+    height: var(--heightpop);
     display: flex;
+    opacity: none;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    background-color: var(--yellow);
+    overflow: hidden !important;
+    margin: 0;
+    padding: 0;
+    position: relative; /* Ensure notes stay within the body */
+
+}
+button{
+    cursor: pointer;
 }

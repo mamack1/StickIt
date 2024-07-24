@@ -3,11 +3,11 @@
 		"target": "ES6",
 		"lib": ["dom", "es6"],
 		"module": "commonjs",
-		"outDir": "./",
+		"outDir": "./dist",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true
 	},
-	"include": ["*.ts", "test_draggable_div.tsx"],
-	"exclude": []
+	"include": ["src/*.ts"],
+	"exclude": ["node_modules"]
 }

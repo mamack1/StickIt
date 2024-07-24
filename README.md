@@ -1,5 +1,5 @@
 # StickIt
-<img src="https://github.com/JacksonBair/StickIt/blob/main/ic.png?raw=true" width="200">
+<img src="https://github.com/JacksonBair/StickIt/blob/Khay-Dev/imgs/icon.png?raw=true" width="250">
 
 Welcome to **StickIt!** 
 

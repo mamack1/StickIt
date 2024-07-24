@@ -8,7 +8,7 @@
 		"48": "imgs/icon.png",
 		"128": "imgs/icon.png"
 	},
-	"permissions": ["storage", "activeTab", "scripting", "windows"],
+	"permissions": ["storage", "activeTab", "scripting", "tabs"],
 	"action": {
 		"default_icon": {
 			"16": "imgs/icon.png",
@@ -20,5 +20,12 @@
 	},
 	"background": {
 		"service_worker": "js/background.js"
-	}
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["js/note.js"],
+			"run_at": "document_end"
+		}
+	]
 }

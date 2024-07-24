@@ -8,7 +8,7 @@ function createNewNote() {
     <button class="close-note">X</button>
     `;
 
-	// makeDraggable(note);
+	makeDraggable(note);
 
 	document.body.appendChild(note);
 
@@ -20,28 +20,28 @@ function createNewNote() {
 }
 
 //draggable
-// function makeDraggable(element: HTMLElement) {
-// 	let offsetX: number,
-// 		offsetY: number,
-// 		isDragging: boolean = false;
+function makeDraggable(element: HTMLElement) {
+	let offsetX: number,
+		offsetY: number,
+		isDragging: boolean = false;
 
-// 	element.addEventListener("mousedown", (event) => {
-// 		offsetX = event.clientX - element.getBoundingClientRect().left;
-// 		offsetY = event.clientY - element.getBoundingClientRect().top;
-// 		isDragging = true;
-// 	});
+	element.addEventListener("mousedown", (event) => {
+		offsetX = event.clientX - element.getBoundingClientRect().left;
+		offsetY = event.clientY - element.getBoundingClientRect().top;
+		isDragging = true;
+	});
 
-// 	document.addEventListener("mousemove", (event) => {
-// 		if (isDragging) {
-// 			element.style.left = `${event.clientX - offsetX}px`;
-// 			element.style.top = `${event.clientY - offsetY}px`;
-// 		}
-// 	});
+	document.addEventListener("mousemove", (event) => {
+		if (isDragging) {
+			element.style.left = `${event.clientX - offsetX}px`;
+			element.style.top = `${event.clientY - offsetY}px`;
+		}
+	});
 
-// 	document.addEventListener("mouseup", () => {
-// 		isDragging = false;
-// 	});
-// }
+	document.addEventListener("mouseup", () => {
+		isDragging = false;
+	});
+}
 
 document.addEventListener("DOMContentLoaded", () => {
 	const createNote = document.getElementById("createNote");

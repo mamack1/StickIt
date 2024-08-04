@@ -9,6 +9,7 @@
 		"128": "imgs/icon.png"
 	},
 	"permissions": ["storage", "activeTab", "scripting", "tabs"],
+	"host_permissions": ["<all_urls>"],
 	"action": {
 		"default_icon": {
 			"16": "imgs/icon.png",
@@ -19,7 +20,8 @@
 		"default_popup": "pages/popup.html"
 	},
 	"background": {
-		"service_worker": "js/background.js"
+		"service_worker": "js/background.js",
+		"type": "module"
 	},
 	"content_scripts": [
 		{

@@ -1,19 +1,20 @@
-// TODO: Figure out why the storage doesn't work
-const note = "pog!";
+// On idle store notes in local, and sync
+// On shutdown store notes in local, and sync
+const value = "pog!";
 const key = "pog?";
 function storeNote() {
-    chrome.storage.session.set({ key: note }).then(() => {   
-        console.log("Value = " + key + " " + note);
+    chrome.storage.local.set({ key: value }).then(() => {   
+        console.log("Value = " + key + " " + value);
     });
 }
 function retrieveNote() {
-    chrome.storage.session.get(["pog?"]).then((result) => {
-        console.log("Value is " + result.key);
+    chrome.storage.local.get(["key"]).then((result) => {
+        console.log("Value is " + result.key + " " + result.value);
     });
 }
 
 function clearStorage() {
-    chrome.storage.session.clear(() => {
+    chrome.storage.local.clear(() => {
         console.log("All keys cleared");
     });
 }
@@ -45,4 +46,6 @@ if (clearStorageButton) {
 // X-Y are present in the greater div
 // The content is present in the textArea
 // How do I access the ID
+
+
 

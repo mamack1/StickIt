@@ -26,8 +26,7 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["js/note.js"],
-			"run_at": "document_end"
+			"js": ["js/content.js"]
 		}
 	]
 }

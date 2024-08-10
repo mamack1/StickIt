@@ -1,4 +1,4 @@
-//TODO: Remove unnecesarry Console Logs
+//TODO: Remove unnecessary Console Logs
 //TODO: Clean Up
 console.log("injectNoteScript.ts loaded");
 
@@ -10,7 +10,7 @@ interface Note {
 	innerhtml: string;
 }
 
-//TODO: fix possible mathcing ids
+//TODO: fix possible matching ids
 // Function to generate a unique ID for the note
 function generateUniqueId(): string {
 	return Math.random().toString(36).substr(2, 9);
@@ -18,11 +18,8 @@ function generateUniqueId(): string {
 
 // Function to create and display the note
 function createNewNote(noteData: Note) {
-	console.log("Creating new note");
-
 	const noteElement = createNoteElement(noteData);
 	document.body.appendChild(noteElement);
-	console.log("Note element added to body");
 }
 
 // Function to create HTML element for the note
@@ -36,8 +33,6 @@ function createNoteElement(noteData: Note): HTMLElement {
 	noteElement.style.left = `${noteData.position.left}px`;
 
 	makeDraggable(noteElement);
-	//!Necesarry?
-	// setupTextArea(noteElement, noteData);
 	setupCloseButton(noteElement);
 
 	return noteElement;
@@ -80,40 +75,28 @@ function makeDraggable(element: HTMLElement) {
 	});
 }
 
-//TODO: Inject CSS dynamically, remove inline styling
-// Create a new note with sample data
-const noteData: Note = {
-	id: generateUniqueId(),
-	color: "yellow",
-	position: { top: 100, left: 100 },
-	innerhtml: `
-        <div class="note" style="background-color: yellow; position: absolute; top: 100px; left: 100px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">
-            <textarea class="note-content" style="width: 100%; height: 100px; background-color: yellow; border: none; resize: none; outline: none; color: black;">New Note!!!!</textarea>
-            <button class="close-note" style="position: absolute; top: 5px; right: 5px; background-color: yellow; color: black; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">X</button>
-        </div>
-    `,
-};
+// This function will be called by the background script when requested
+function handleCreateNoteRequest() {
+	const noteData: Note = {
+		id: generateUniqueId(),
+		color: "yellow",
+		position: { top: 100, left: 100 },
+		innerhtml: `
+            <div class="note" style="background-color: yellow; position: absolute; top: 100px; left: 100px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">
+                <textarea class="note-content" style="width: 100%; height: 100px; background-color: yellow; border: none; resize: none; outline: none; color: black;">New Note!!!!</textarea>
+                <button class="close-note" style="position: absolute; top: 5px; right: 5px; background-color: yellow; color: black; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">X</button>
+            </div>
+        `,
+	};
 
-createNewNote(noteData);
+	createNewNote(noteData);
+}
 
-// //! This bypasses the service worker to make the note in the extension window, use for testing and creating note element
-// document.addEventListener("DOMContentLoaded", () => {
-// 	const testBTN = document.getElementById("testComponentBtn");
-// 	if (testBTN) {
-// 		testBTN.addEventListener("click", () => {
-// 			console.log("note function called in note.ts!");
-// 			const newNoteData: Note = {
-// 				id: generateUniqueId(),
-// 				color: "yellow",
-// 				position: { top: 100, left: 100 },
-// 				innerhtml: `
-//                     <div class="note" style="background-color: yellow; position: absolute; top: 100px; left: 100px;">
-//                         <textarea class="note-content" rows="4" cols="20">This is another note</textarea>
-//                         <button class="close-note">X</button>
-//                     </div>
-//                 `,
-// 			};
-// 			createNewNote(newNoteData);
-// 		});
-// 	}
-// });
+// Listen for createNote messages
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.action === "createNote") {
+		handleCreateNoteRequest();
+		sendResponse({ success: true });
+		return true;
+	}
+});

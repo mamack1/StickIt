@@ -1,4 +1,4 @@
-
+const noteList = new Array<object>();
 // On idle store notes in local, and sync
 // On shutdown store notes in local, and sync
 const value = "pog!";
@@ -56,6 +56,7 @@ if (testNoteCreation) {
 // How do I access the ID
 
 function convertNoteToJson(string: string){
+    // for (let i = 0; i < string.length)
 
 }
 
@@ -66,18 +67,18 @@ interface Note {
 	innerhtml: string;
 }
 
-function generateUniqueId(): string {
+function generateUniqueId2(): string {
 	return Math.random().toString(36).substr(2, 9);
 }
 
 // Function to create and display the note
-function createNewNote(noteData: Note) {
-	const noteElement = createNoteElement(noteData);
+function createNewNote2(noteData: Note) {
+	const noteElement = createNoteElement2(noteData);
 	document.body.appendChild(noteElement);
 }
 
 // Function to create HTML element for the note
-function createNoteElement(noteData: Note): HTMLElement {
+function createNoteElement2(noteData: Note): HTMLElement {
 	const noteContainer = document.createElement("div");
 	noteContainer.innerHTML = noteData.innerhtml.trim();
 
@@ -86,14 +87,14 @@ function createNoteElement(noteData: Note): HTMLElement {
 	noteElement.style.top = `${noteData.position.top}px`;
 	noteElement.style.left = `${noteData.position.left}px`;
 
-	makeDraggable(noteElement);
-	setupCloseButton(noteElement);
+	makeDraggable2(noteElement);
+	setupCloseButton2(noteElement);
 
 	return noteElement;
 }
 
 // Function to set up the close button for the note
-function setupCloseButton(noteElement: HTMLElement) {
+function setupCloseButton2(noteElement: HTMLElement) {
 	const closeButton = noteElement.querySelector(
 		".close-note"
 	) as HTMLButtonElement;
@@ -105,7 +106,7 @@ function setupCloseButton(noteElement: HTMLElement) {
 }
 
 // Function to make the note draggable
-function makeDraggable(element: HTMLElement) {
+function makeDraggable2(element: HTMLElement) {
 	let offsetX: number, offsetY: number;
 	let isDragging = false;
 
@@ -130,9 +131,9 @@ function makeDraggable(element: HTMLElement) {
 }
 
 // This function will be called by the background script when requested
-function handleCreateNoteRequest() {
+function handleCreateNoteRequest2() {
 	const noteData: Note = {
-		id: generateUniqueId(),
+		id: generateUniqueId2(),
 		color: "yellow",
 		position: { top: 100, left: 100 },
 		innerhtml: `
@@ -143,7 +144,7 @@ function handleCreateNoteRequest() {
         `,
 	};
 
-	createNewNote(noteData);
+	createNewNote2(noteData);
 	// TODO: Stringigying the note for stoage testing
     noteList.push(noteData);
     console.log(noteList);
@@ -151,4 +152,3 @@ function handleCreateNoteRequest() {
 	
 }
 
-export const noteList = new Array<object>();

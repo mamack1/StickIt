@@ -91,7 +91,7 @@ function handleCreateNoteRequest() {
 
 	createNewNote(noteData);
 	// TODO: Stringigying the note for stoage testing
-	noteList.push(noteData);
+	// noteList.push(noteData);
 	
 }
 

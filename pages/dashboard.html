@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="UTF8" />
-		<meta name="viewport" content="width=devicewidth, initialscale=1.0" />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="../css/dash.css" />
 		<link rel="stylesheet" href="../css/variables.css" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,7 +13,6 @@
 		/>
 		<link rel="stylesheet" href="../css/noteTest.css" />
 	</head>
-
 	<body>
 		<div class="dash_contain">
 			<div class="menu"></div>
@@ -26,15 +25,25 @@
 						</button>
 					</div>
 					<div class="dashBox">
-						<div class="dashSticks">
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<button class="dashStickSquare" id="createNote">
-								Create Note
-							</button>
+						<div class="dashSticks" id="noteParent">
+							<div class="dashStickSquare" noteColor="#FF5733">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
+							<div class="dashStickSquare" noteColor="#33FF57">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
+							<div class="dashStickSquare" noteColor="#3357FF">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
+							<div class="dashStickSquare" noteColor="#F333FF">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
+							<div class="dashStickSquare" noteColor="#FF33A0">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
+							<div class="dashStickSquare" noteColor="#33FFF5">
+								<button class="createNoteBtn">Create Note</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -48,6 +57,6 @@
 		</div>
 		<script src="../js/dash.js"></script>
 		<script src="../js/dashboard.js"></script>
-		<script type="module" src="../js/note.js"></script>
+		<!-- <script type="module" src="../js/note.js"></script> -->
 	</body>
 </html>

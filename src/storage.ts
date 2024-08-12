@@ -1,3 +1,4 @@
+
 // On idle store notes in local, and sync
 // On shutdown store notes in local, and sync
 const value = "pog!";
@@ -46,6 +47,11 @@ if (clearStorageButton) {
 // X-Y are present in the greater div
 // The content is present in the textArea
 // How do I access the ID
+
+function convertNoteToJson(){
+
+}
+
 
 
 

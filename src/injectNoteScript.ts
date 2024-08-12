@@ -91,7 +91,6 @@ function handleCreateNoteRequest() {
 
 	createNewNote(noteData);
 	// TODO: Stringigying the note for stoage testing
-	// noteList.push(noteData);
 	
 }
 
@@ -105,4 +104,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Exporting an array of notes
-export const noteList = new Array<object>();

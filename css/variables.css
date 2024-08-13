@@ -3,6 +3,8 @@
     --heightpop:600px;
     --notesDuration:3s;
     --spBotDuration:5s;
+    --toolbarBg:#FFFFFF;
+    --toolbarHover:#000;
 }
 body {
     width: 360px;

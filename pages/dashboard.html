@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="UTF8" />
-		<meta name="viewport" content="width=devicewidth, initialscale=1.0" />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="../css/dash.css" />
 		<link rel="stylesheet" href="../css/variables.css" />
+		<link rel="stylesheet" href="../css/toolbar.css" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
 			rel="stylesheet"
 		/>
-		<link rel="stylesheet" href="../css/noteTest.css" />
 	</head>
-
 	<body>
+		
 		<div class="dash_contain">
 			<div class="menu"></div>
+
 			<div class="sectionOne_dash">
 				<div class="dashRowOne">
 					<div class="dashHeader">
@@ -26,15 +27,25 @@
 						</button>
 					</div>
 					<div class="dashBox">
-						<div class="dashSticks">
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<div class="dashStickSquare"></div>
-							<button class="dashStickSquare" id="createNote">
-								Create Note
-							</button>
+						<div class="dashSticks" id="noteParent">
+							<div class="dashStickSquare" noteColor="#FF5733">
+								<button class="createNoteBtn"></button>
+							</div>
+							<div class="dashStickSquare" noteColor="#33FF57">
+								<button class="createNoteBtn"></button>
+							</div>
+							<div class="dashStickSquare" noteColor="#3357FF">
+								<button class="createNoteBtn"></button>
+							</div>
+							<div class="dashStickSquare" noteColor="#F333FF">
+								<button class="createNoteBtn"></button>
+							</div>
+							<div class="dashStickSquare" noteColor="#FF33A0">
+								<button class="createNoteBtn"></button>
+							</div>
+							<div class="dashStickSquare" noteColor="#33FFF5">
+								<button class="createNoteBtn"></button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -46,8 +57,33 @@
 				</div>
 			</div>
 		</div>
+		<div class="toolbar">
+			<button id="iconOne">
+				<img src="../imgs/Move.png" alt="icon" />
+			</button>
+			<button id="iconTwo">
+				<img src="../imgs/text.png" alt="icon" />
+			</button>
+			<button id="iconThree">
+				<img src="../imgs/eraser.png" alt="icon" />
+			</button>
+			<button id="iconFour">
+				<div alt="circle"></div>
+			</button>
+			<input type="color" id="colorPicker" style="display: none;" />
+			<button id="iconFive">
+				<img src="../imgs/undo.png" alt="icon" />
+			</button>
+			<button id="iconSix">
+				<img src="../imgs/redo.png" alt="icon" />
+			</button>
+			<button id="iconSeven">
+				<img src="../imgs/saveic.png" alt="icon" />
+			</button>
+		</div>
+		
 		<script src="../js/dash.js"></script>
 		<script src="../js/dashboard.js"></script>
-		<script type="module" src="../js/note.js"></script>
+		<script src="../js/toolbar.js"></script>
 	</body>
 </html>

@@ -1,12 +1,13 @@
 const noteList = new Array<object>();
 // On idle store notes in local, and sync
 // On shutdown store notes in local, and sync
-const value = "pog!";
-const key = "pog?";
+
 function storeNote() {
-    chrome.storage.local.set({ key: value }).then(() => {   
-        console.log("Value = " + key + " " + value);
-    });
+        for(let note of noteList) {
+			for(let item in Object.entries(note)) {
+				console.log(`${item}: ${(note as {[key: string]: string})[item]}`);
+			}
+		}
 }
 function retrieveNote() {
     chrome.storage.local.get(["key"]).then((result) => {
@@ -45,7 +46,7 @@ if (clearStorageButton) {
 
 const testNoteCreation = document.getElementById("testNoteCreation");
 if (testNoteCreation) {
-	testNoteCreation.addEventListener("click", handleCreateNoteRequest);
+	testNoteCreation.addEventListener("click", handleCreateNoteRequest2);
 } else {
 	console.error("Test Note Creation button not found");
 }
@@ -55,10 +56,7 @@ if (testNoteCreation) {
 // The content is present in the textArea
 // How do I access the ID
 
-function convertNoteToJson(string: string){
-    // for (let i = 0; i < string.length)
 
-}
 
 interface Note {
 	id: string;
@@ -148,7 +146,16 @@ function handleCreateNoteRequest2() {
 	// TODO: Stringigying the note for stoage testing
     noteList.push(noteData);
     console.log(noteList);
-
+	convertNoteToJson()
 	
-}
+};
 
+function convertNoteToJson(){
+    for (let i = 0; i < noteList.length; i++) {
+		let note = noteList[i];
+		let jsonString = JSON.stringify(note);
+		console.log(jsonString);
+
+}}
+
+function convertActiveNoteToObject(){}

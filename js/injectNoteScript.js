@@ -8,53 +8,99 @@ function createNewNote(noteData) {
     document.body.appendChild(noteElement);
 }
 function createNoteElement(noteData) {
-    const noteContainer = document.createElement("div");
-    noteContainer.innerHTML = noteData.innerhtml.trim();
-    const noteElement = noteContainer.firstChild;
-    noteElement.style.backgroundColor = noteData.color;
-    noteElement.style.top = `${noteData.position.top}px`;
-    noteElement.style.left = `${noteData.position.left}px`;
-    makeDraggable(noteElement);
-    setupCloseButton(noteElement);
-    return noteElement;
+    const noteHost = document.createElement("div");
+    noteHost.style.position = "absolute";
+    noteHost.style.top = `${noteData.position.top}px`;
+    noteHost.style.left = `${noteData.position.left}px`;
+    noteHost.style.width = "200px";
+    noteHost.style.height = "150px";
+    noteHost.style.zIndex = "2147483646";
+    const shadowRoot = noteHost.attachShadow({ mode: "open" });
+    const noteContent = document.createElement("div");
+    noteContent.innerHTML = noteData.innerhtml.trim();
+    noteContent.style.backgroundColor = noteData.color;
+    noteContent.style.padding = "10px";
+    noteContent.style.borderRadius = "5px";
+    noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+    const handle = document.createElement("div");
+    handle.style.width = "50px";
+    handle.style.height = "5px";
+    handle.style.marginTop = "5px";
+    handle.style.marginBottom = "5px";
+    handle.style.backgroundColor = "grey";
+    handle.style.borderRadius = "10px";
+    handle.style.position = "absolute";
+    handle.style.top = "5px";
+    handle.style.left = "50%";
+    handle.style.transform = "translateX(-50%)";
+    handle.style.cursor = "grab";
+    handle.style.zIndex = "2147483647";
+    noteContent.appendChild(handle);
+    const textarea = noteContent.querySelector(".note-content");
+    textarea.style.width = "100%";
+    textarea.style.height = "100px";
+    textarea.style.backgroundColor = noteData.color;
+    textarea.style.border = "none";
+    textarea.style.resize = "none";
+    textarea.style.outline = "none";
+    textarea.style.color = "black";
+    const closeButton = noteContent.querySelector(".close-note");
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "5px";
+    closeButton.style.right = "5px";
+    closeButton.style.backgroundColor = noteData.color;
+    closeButton.style.color = "black";
+    closeButton.style.border = "none";
+    closeButton.style.borderRadius = "50%";
+    closeButton.style.width = "20px";
+    closeButton.style.height = "20px";
+    closeButton.style.cursor = "pointer";
+    shadowRoot.appendChild(noteContent);
+    document.body.appendChild(noteHost);
+    setupCloseButton(noteHost);
+    makeDraggable(handle, noteHost);
+    return noteHost;
 }
-function setupCloseButton(noteElement) {
-    const closeButton = noteElement.querySelector(".close-note");
+function setupCloseButton(noteHost) {
+    var _a;
+    const closeButton = (_a = noteHost.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(".close-note");
     if (closeButton) {
         closeButton.addEventListener("click", () => {
-            document.body.removeChild(noteElement);
+            document.body.removeChild(noteHost);
         });
     }
 }
-function makeDraggable(element) {
+function makeDraggable(handle, noteHost) {
     let offsetX, offsetY;
     let isDragging = false;
-    element.addEventListener("mousedown", (event) => {
-        offsetX = event.clientX - element.getBoundingClientRect().left;
-        offsetY = event.clientY - element.getBoundingClientRect().top;
+    handle.addEventListener("mousedown", (event) => {
+        offsetX = event.clientX - noteHost.getBoundingClientRect().left;
+        offsetY = event.clientY - noteHost.getBoundingClientRect().top;
         isDragging = true;
-        element.style.cursor = "grabbing";
+        handle.style.cursor = "grabbing";
     });
     document.addEventListener("mousemove", (event) => {
         if (isDragging) {
-            element.style.left = `${event.clientX - offsetX}px`;
-            element.style.top = `${event.clientY - offsetY}px`;
+            const newX = event.clientX - offsetX;
+            const newY = event.clientY - offsetY;
+            noteHost.style.left = `${newX}px`;
+            noteHost.style.top = `${newY}px`;
         }
     });
     document.addEventListener("mouseup", () => {
         isDragging = false;
-        element.style.cursor = "grab";
+        handle.style.cursor = "grab";
     });
 }
 function handleCreateNoteRequest(color) {
     const noteData = {
         id: generateUniqueId(),
         color: color,
-        position: { top: 100, left: 100 },
+        position: { top: 100, left: 700 },
         innerhtml: `
-            <div class="note" style="background-color: ${color}; z-index: 2147483647; position: absolute; top: 100px; left: 100px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">
-                <textarea class="note-content" style="width: 100%; height: 100px; background-color: ${color}; border: none; resize: none; outline: none; color: black;">New Note!!!!</textarea>
-                <button class="close-note" style="position: absolute; top: 5px; right: 5px; background-color: ${color}; color: black; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">X</button>
+            <div class="note" style="padding: 10px;">
+                <textarea class="note-content">New Note!!!!</textarea>
+                <button class="close-note">X</button>
             </div>
         `,
     };

@@ -20,3 +20,6 @@
     outline: none;
     background-color: transparent;
 }
+.close-note button{
+    text-align: center;
+}

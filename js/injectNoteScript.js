@@ -20,10 +20,7 @@ function createNoteElement(noteData) {
 
   const noteContent = document.createElement("div");
   noteContent.innerHTML = noteData.innerhtml.trim();
-  noteContent.style.backgroundColor = noteData.color;
   noteContent.style.padding = "10px";
-  noteContent.style.borderRadius = "5px";
-  noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
 
   const handle = document.createElement("div");
   handle.style.width = "50px";
@@ -53,7 +50,7 @@ function createNoteElement(noteData) {
   closeButton.style.position = "absolute";
   closeButton.style.top = "5px";
   closeButton.style.right = "5px";
-  closeButton.style.backgroundColor = noteData.color;
+  closeButton.style.backgroundColor = "#f12a2a";
   closeButton.style.color = "black";
   closeButton.style.border = "none";
   closeButton.style.borderRadius = "50%";
@@ -92,6 +89,12 @@ function injectNoteStyles() {
         outline: none;
         background-color: transparent;
     }
+        .close-note{
+    text-align: center;
+    padding: 0px;
+    margin: 0px;
+    font-size:12px;
+}
   `;
   document.head.appendChild(style);
 }
@@ -135,7 +138,7 @@ function handleCreateNoteRequest(color) {
     position: { top: 100, left: 700 },
     innerhtml: `
             <div class="note" style="padding: 10px;">
-                <textarea class="note-content">New Note!!!!</textarea>
+                <textarea class="note-content" placeholder="New Note!!!!" ></textarea>
                 <button class="close-note">X</button>
             </div>
         `,

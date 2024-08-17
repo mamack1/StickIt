@@ -9,6 +9,67 @@ function createNewNote(noteData) {
   document.body.appendChild(noteElement);
 }
 
+// function createNoteElement(noteData) {
+//   const noteHost = document.createElement("div");
+//   noteHost.style.position = "absolute";
+//   noteHost.style.top = `${noteData.position.top}px`;
+//   noteHost.style.left = `${noteData.position.left}px`;
+//   noteHost.style.width = "200px";
+//   noteHost.style.height = "150px";
+//   noteHost.style.zIndex = "2147483646";
+
+//   const noteContent = document.createElement("div");
+//   noteContent.innerHTML = noteData.innerhtml.trim();
+//   noteContent.style.padding = "10px";
+//   noteContent.style.backgroundColor = noteData.color; // Set background color for noteContent
+
+//   const handle = document.createElement("div");
+//   handle.style.width = "50px";
+//   handle.style.height = "5px";
+//   handle.style.marginTop = "5px";
+//   handle.style.marginBottom = "5px";
+//   handle.style.backgroundColor = noteData.color;
+//   handle.style.borderRadius = "10px";
+//   handle.style.position = "absolute";
+//   handle.style.top = "5px";
+//   handle.style.left = "50%";
+//   handle.style.transform = "translateX(-50%)";
+//   handle.style.cursor = "grab";
+//   handle.style.zIndex = "2147483647";
+//   noteContent.appendChild(handle);
+
+//   const textarea = noteContent.querySelector(".note-content");
+//   if (textarea) {
+//     textarea.style.width = "100%";
+//     textarea.style.height = "100px";
+//     textarea.style.backgroundColor = noteData.color; // Set background color for textarea
+//     textarea.style.border = "none";
+//     textarea.style.resize = "none";
+//     textarea.style.outline = "none";
+//     textarea.style.color = "black";
+//   }
+
+//   const closeButton = noteContent.querySelector(".close-note");
+//   if (closeButton) {
+//     closeButton.style.position = "absolute";
+//     closeButton.style.top = "5px";
+//     closeButton.style.right = "5px";
+//     closeButton.style.backgroundColor = "#f12a2a";
+//     closeButton.style.color = "black";
+//     closeButton.style.border = "none";
+//     closeButton.style.borderRadius = "50%";
+//     closeButton.style.width = "20px";
+//     closeButton.style.height = "20px";
+//     closeButton.style.cursor = "pointer";
+//   }
+
+//   noteHost.appendChild(noteContent);
+//   injectNoteStyles();
+//   setupCloseButton(noteHost);
+//   makeDraggable(handle, noteHost);
+
+//   return noteHost;
+// }
 function createNoteElement(noteData) {
   const noteHost = document.createElement("div");
   noteHost.style.position = "absolute";
@@ -21,6 +82,11 @@ function createNoteElement(noteData) {
   const noteContent = document.createElement("div");
   noteContent.innerHTML = noteData.innerhtml.trim();
   noteContent.style.padding = "10px";
+  noteContent.style.backgroundColor = noteData.color; // Set background color for noteContent
+
+  // Logging for debugging
+  console.log("Setting background color:", noteData.color);
+  console.log("noteContent styles:", noteContent.style.cssText);
 
   const handle = document.createElement("div");
   handle.style.width = "50px";
@@ -41,7 +107,7 @@ function createNoteElement(noteData) {
   if (textarea) {
     textarea.style.width = "100%";
     textarea.style.height = "100px";
-    textarea.style.backgroundColor = noteData.color;
+    textarea.style.backgroundColor = noteData.color; // Set background color for textarea
     textarea.style.border = "none";
     textarea.style.resize = "none";
     textarea.style.outline = "none";
@@ -91,7 +157,6 @@ function injectNoteStyles() {
         resize: none;
         border: none;
         outline: none;
-        background-color: transparent;
       }
 
       .close-note {
@@ -279,6 +344,24 @@ function injectToolbarStyles() {
 function setupToolbarEventListeners() {
   // Add event listeners for toolbar buttons here
 }
+// chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//   if (tabs.length === 0) {
+//     console.error("No active tab found");
+//     return;
+//   }
+//   const activeTab = tabs[0].id;
+//   chrome.tabs.sendMessage(
+//     activeTab,
+//     { action: "createNote", color: color },
+//     (response) => {
+//       if (response.success) {
+//         console.log("Note creation message sent successfully");
+//       } else {
+//         console.error("Error creating note:", response.error);
+//       }
+//     }
+//   );
+// });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "createNote") {
@@ -286,5 +369,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("NOTE INJECTED");
     sendResponse({ success: true });
     return true;
+  } else {
+    sendResponse({ success: false, error: "Invalid action" });
   }
 });

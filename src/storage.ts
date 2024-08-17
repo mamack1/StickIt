@@ -1,13 +1,13 @@
-const noteList = new Array<object>();
+const noteList = new Array<Note>();
 // On idle store notes in local, and sync
 // On shutdown store notes in local, and sync
 
 function storeNote() {
-        for(let note of noteList) {
-			for(let item in Object.entries(note)) {
-				console.log(`${item}: ${(note as {[key: string]: string})[item]}`);
-			}
-		}
+        // for(let note of noteList) {
+		// 	for(let item in Object.entries(note)) {
+		// 		console.log(`${item}: ${(note as {[key: string]: string})[item]}`);
+		// 	}
+		// }
 }
 function retrieveNote() {
     chrome.storage.local.get(["key"]).then((result) => {
@@ -154,6 +154,7 @@ function convertNoteToJson(){
     for (let i = 0; i < noteList.length; i++) {
 		let note = noteList[i];
 		let jsonString = JSON.stringify(note);
+		chrome.storage.local.set({[note.id]: note})
 		console.log(jsonString);
 
 }}

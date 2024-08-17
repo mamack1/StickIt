@@ -3,7 +3,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const noteParent = document.getElementById("noteParent");
     if (noteParent) {
-        // Function to handle the click event
         function handleClick(event) {
             console.log("EVENT LISTENER TRIGGERED!!!");
             const target = event.target;
@@ -21,9 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
         }
-        // Remove any existing event listeners on the parent container
         noteParent.removeEventListener("click", handleClick);
-        // Add the event listener
         noteParent.addEventListener("click", handleClick);
     }
     else {

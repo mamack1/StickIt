@@ -9,16 +9,6 @@ function storeNote() {
     // 	}
     // }
 }
-function retrieveNote() {
-    chrome.storage.local.get(["key"]).then((result) => {
-        console.log("Value is " + result.key + " " + result.value);
-    });
-}
-function clearStorage() {
-    chrome.storage.local.clear(() => {
-        console.log("All keys cleared");
-    });
-}
 const storeNoteButton = document.getElementById("storeNote");
 if (storeNoteButton) {
     storeNoteButton.addEventListener("click", storeNote);
@@ -124,5 +114,34 @@ function convertNoteToJson() {
         chrome.storage.local.set({ [note.id]: note });
         console.log(jsonString);
     }
+}
+function createNoteFromStorage(result) {
+    let note = JSON.parse(result);
+    console.log("running createNoteFromStorage");
+    console.log(note);
+    createNewNote2(note);
+}
+function retrieveNote() {
+    console.log("RetriveNote is running");
+    chrome.storage.local.get(null).then(result => {
+        let stringyData = JSON.stringify(result);
+        // console.log(stringyData);
+        addNoteToArray(stringyData);
+    });
+}
+function addNoteToArray(stringyData) {
+    let parsedData = JSON.parse(stringyData);
+    let note = parsedData;
+    noteList.push(note);
+    console.log(noteList);
+}
+function clearStorage() {
+    for (let i = 0; i < noteList.length; i++) {
+        noteList.pop();
+    }
+    console.log(noteList);
+    chrome.storage.local.clear(() => {
+        console.log("All keys cleared");
+    });
 }
 function convertActiveNoteToObject() { }

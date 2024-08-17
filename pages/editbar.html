@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF8" />
+		<meta name="viewport" content="width=devicewidth, initialscale=1.0" />
+		<link rel="stylesheet" href="../css/dash.css" />
+		<link rel="stylesheet" href="../css/variables.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="../css/noteTest.css" />
+        <link rel="stylesheet" href="../css/editbar.css" />
+	</head>
+
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<title>toolbar testing</title>
+	<script src=editbar.js></script>
+	<style>
+		body {
+			display: flex;
+			flex-direction: column;
+			margin: 0;
+			height: 95vh;
+			font-size: 18px;
+		}
+		textarea {
+			flex: auto;
+			font-size: 18px;
+		}
+		[role="toolbar"]{
+			counter-reset: buttoncounter;
+			margin: 2px 10px;
+		}
+		[role="toolbar"] button {
+			height: 1.3em;
+			position: relative;
+			padding: 1px 4px 14px;
+			min-width: 1.5em;
+			vertical-align: bottom;
+			counter-increment: buttoncounter;
+			outline: none; /* we will use the highlighting below to indicate focus */
+		}
+		[role="toolbar"] button::before {
+		  content: attr(name);
+			position: relative;
+			bottom: 0.1em;
+		}
+		[role="toolbar"].capturing-menu:focus-within:not(:active) button::after {
+			content: counter(buttoncounter, upper-alpha);
+			position: absolute;
+			opacity: 20%;
+			z-index: 1;
+			top: -0.3em;
+			left: 0;
+			width: 100%;
+			font-size: 200%;
+			font-family: sans-serif;
+			font-style: normal;
+			color: black;
+			font-weight: bold;
+		}
+		[role="toolbar"] button.highlight , [role="toolbar"] button[aria-pressed="true"]{
+			background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
+			border: 2px inset buttonface;
+			border-radius: 4px;
+		}
+		[role="toolbar"] button:focus {
+			background: linear-gradient(ThreeDHighlight, ThreeDHighlight, ButtonFace);
+			border: 2px inset black;
+			border-radius: 4px;
+		}
+		button.reverse\~words::before {
+			content: '↔️';
+		}
+		button.pig\~latin::before {
+			content: '🐖';
+			bottom: 0.4em
+		}
+		button.a , button.ש {
+			margin-left: 0.5em;
+		}
+		button.z , button.ז {
+			margin-left: 1em;
+		}
+		button.ק {
+			margin-left: 1.5em;
+		}
+		button.cursive { font-family: cursive }
+		button.fantasy { font-family: fantasy }
+		button.monospace { font-family: monospace }
+		button.sans-serif { font-family: sans-serif }
+		button.serif { font-family: serif }
+		button.toggledirection::before {
+			content: '➡️';
+		}
+		button.toggledirection.rtl::before {
+			content: '⬅️';
+		}
+		span.light {
+			width: 1em;
+			display: inline-block;
+			height: 1em;
+			border-radius: 50%;
+			box-sizing: border-box;
+			background: grey;
+			margin: 0 5px;
+			position: relative;
+			top: 0.2em;
+			border: 3px solid white;
+		}
+		span.light.on {
+			background: green;
+			border: 2px solid yellow;
+		}
+	</style>
+	</head>
+	<div id=keyboard style=display:none ></div>
+	<div id=toolbar><button name='nothing'></button></div>
+	<textarea></textarea>
+	<script>
+	
+	
+	const commands = {
+		donothing (){
+			console.log('Nothing happens.');
+		},
+		
+		reverse (){
+			this.value = this.value.split('\n').map(function(s){
+				return s.split(/[ ]+/).reverse().join(' ');
+			}).join('\n');
+		},
+	
+		anslatetray (){
+			this.value = this.value.replace(/([bcdfghjklmnpqrstvwxyz]*)([aeiou])([a-z]*)/ig,
+			 (_, p1, p2, p3) => p2 + p3 + ( p1 ? p1 + 'ay' : 'way'))
+		},
+	
+		kbd(){
+			Toolbar.toggleAttribute(document.querySelector('#keyboard'),'style.display', ['block','none']);
+		},
+		
+		randomizeFont (){
+			const font = ['cursive','fantasy','monospace','sans-serif','serif'][Math.floor(Math.random() * 5)];
+			this.style.fontFamily = font;
+		},
+		
+		underline (){
+			Toolbar.toggleAttribute(this, 'style.textDecorationLine', ['underline', 'none']);
+		},
+		
+		toggledirection (){
+			Toolbar.toggleAttribute(this, 'dir', ['rtl', 'ltr']);		
+		},
+		
+		greenlight (){
+			Toolbar.toggleAttribute(this, 'data-green-light', ['on', 'off']);		
+		}
+	}
+	
+	function run (command){
+		if (commands[command]) {
+			commands[command].call(this);
+		}else{
+			this.value += command;
+		}
+		document.querySelector('textarea').focus();
+	}
+	
+	function type (command){
+		const before = this.value.substring(0,this.selectionStart);
+		const after = this.value.substring(this.selectionEnd);
+		this.value = before + command + after;
+		this.setSelectionRange (before.length + command.length, before.length + command.length);
+		document.querySelector('textarea').focus();
+	}
+	
+	const t = new Toolbar (document.querySelector('#toolbar'), document.querySelector('textarea'), run, 'toolbar');
+	t.button('reverse~words', 'reverse', 'Reverse Words in Selection');
+	t.button('Ping', ' ping!');
+	t.button('nothing', 'donothing');
+	t.button('pig~latin', 'anslatetray', 'Translate to Pig Latin');
+	t.button(' foo');
+	t.toggleButton('⌨️', 'kbd', 'Toggle Virtual Keyboard');
+	t.observerButton('Random Font', 'randomizeFont', 'style.fontFamily', 'Change Font Randomly');
+	t.toggleButton ('underline');
+	t.observerButton ('toggledirection', undefined, 'dir', 'Toggle Text Direction');
+	t.button ('Green Light', 'greenlight', 'Turn on the Green Light');
+	t.observerElement('<span class=light>', 'data-green-light');
+	
+	const k = new Toolbar(document.querySelector('#keyboard'), document.querySelector('textarea'), type, 'English keyboard');
+	k.buttons('qwertyiop'.split('').map( x => [x] ));
+	k.element('<br>');
+	k.buttons('asdfghjkl;'.split('').map( x => [x] ));
+	k.element('<br>');
+	k.buttons('zxcvbnm,.'.split('').map( x => [x] ));
+	
+	</script>
+	</body>
+	</html>

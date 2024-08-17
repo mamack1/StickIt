@@ -27,7 +27,7 @@ function createNoteElement(noteData) {
   handle.style.height = "5px";
   handle.style.marginTop = "5px";
   handle.style.marginBottom = "5px";
-  handle.style.backgroundColor = "grey";
+  handle.style.backgroundColor = noteData.color;
   handle.style.borderRadius = "10px";
   handle.style.position = "absolute";
   handle.style.top = "5px";
@@ -38,29 +38,32 @@ function createNoteElement(noteData) {
   noteContent.appendChild(handle);
 
   const textarea = noteContent.querySelector(".note-content");
-  textarea.style.width = "100%";
-  textarea.style.height = "100px";
-  textarea.style.backgroundColor = noteData.color;
-  textarea.style.border = "none";
-  textarea.style.resize = "none";
-  textarea.style.outline = "none";
-  textarea.style.color = "black";
+  if (textarea) {
+    textarea.style.width = "100%";
+    textarea.style.height = "100px";
+    textarea.style.backgroundColor = noteData.color;
+    textarea.style.border = "none";
+    textarea.style.resize = "none";
+    textarea.style.outline = "none";
+    textarea.style.color = "black";
+  }
 
   const closeButton = noteContent.querySelector(".close-note");
-  closeButton.style.position = "absolute";
-  closeButton.style.top = "5px";
-  closeButton.style.right = "5px";
-  closeButton.style.backgroundColor = "#f12a2a";
-  closeButton.style.color = "black";
-  closeButton.style.border = "none";
-  closeButton.style.borderRadius = "50%";
-  closeButton.style.width = "20px";
-  closeButton.style.height = "20px";
-  closeButton.style.cursor = "pointer";
+  if (closeButton) {
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "5px";
+    closeButton.style.right = "5px";
+    closeButton.style.backgroundColor = "#f12a2a";
+    closeButton.style.color = "black";
+    closeButton.style.border = "none";
+    closeButton.style.borderRadius = "50%";
+    closeButton.style.width = "20px";
+    closeButton.style.height = "20px";
+    closeButton.style.cursor = "pointer";
+  }
 
   noteHost.appendChild(noteContent);
-  injectNoteStyles(); // No need to pass shadowRoot as we are not using it
-  document.body.appendChild(noteHost);
+  injectNoteStyles();
   setupCloseButton(noteHost);
   makeDraggable(handle, noteHost);
 
@@ -68,35 +71,38 @@ function createNoteElement(noteData) {
 }
 
 function injectNoteStyles() {
-  const style = document.createElement("style");
-  style.textContent = `
-    .note {
+  if (!document.getElementById("noteStyles")) {
+    const style = document.createElement("style");
+    style.id = "noteStyles";
+    style.textContent = `
+      .note {
         position: absolute;
         width: 150px;
         height: 150px;
-        background-color: #fdfd96;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         padding: 30px;
         z-index: 1000;
         margin: 0px;
-    }
+      }
 
-    .note-content {
+      .note-content {
         width: 100%;
         height: 100%;
         resize: none;
         border: none;
         outline: none;
         background-color: transparent;
-    }
-        .close-note{
-    text-align: center;
-    padding: 0px;
-    margin: 0px;
-    font-size:12px;
-}
-  `;
-  document.head.appendChild(style);
+      }
+
+      .close-note {
+        text-align: center;
+        padding: 0px;
+        margin: 0px;
+        font-size: 12px;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 function setupCloseButton(noteHost) {
@@ -137,11 +143,11 @@ function handleCreateNoteRequest(color) {
     color: color,
     position: { top: 100, left: 700 },
     innerhtml: `
-            <div class="note" style="padding: 10px;">
-                <textarea class="note-content" placeholder="New Note!!!!" ></textarea>
-                <button class="close-note">X</button>
-            </div>
-        `,
+      <div class="note" style="padding: 10px;">
+        <textarea class="note-content" placeholder="New Note!!!!"></textarea>
+        <button class="close-note">X</button>
+      </div>
+    `,
   };
   noteData.className = "dashStickSquare";
   createNewNote(noteData);
@@ -153,124 +159,121 @@ function handleCreateNoteRequest(color) {
 }
 
 function injectToolbar() {
-  const toolbar = document.createElement("div");
-  toolbar.className = "toolbar";
-  toolbar.id = "toolbar";
+  if (!document.getElementById("toolbar")) {
+    const toolbar = document.createElement("div");
+    toolbar.className = "toolbar";
+    toolbar.id = "toolbar";
 
-  toolbar.innerHTML = `
-    <button id="iconOne">
+    toolbar.innerHTML = `
+      <button id="iconOne">
         <img src="../imgs/Move.png" alt="icon" />
-    </button>
-    <button id="iconTwo">
+      </button>
+      <button id="iconTwo">
         <img src="../imgs/text.png" alt="icon" />
-    </button>
-    <button id="iconThree">
+      </button>
+      <button id="iconThree">
         <img src="../imgs/eraser.png" alt="icon" />
-    </button>
-    <button id="iconFour">
+      </button>
+      <button id="iconFour">
         <div alt="circle"></div>
-    </button>
-    <input type="color" id="colorPicker" style="display: none;" />
-    <button id="iconFive">
+      </button>
+      <input type="color" id="colorPicker" style="display: none;" />
+      <button id="iconFive">
         <img src="../imgs/undo.png" alt="icon" />
-    </button>
-    <button id="iconSix">
+      </button>
+      <button id="iconSix">
         <img src="../imgs/redo.png" alt="icon" />
-    </button>
-    <button id="iconSeven">
+      </button>
+      <button id="iconSeven">
         <img src="../imgs/saveic.png" alt="icon" />
-    </button>
-  `;
+      </button>
+    `;
 
-  // Append the toolbar to the body
-  document.body.appendChild(toolbar);
-
-  // Inject the CSS styles into the document head
-  injectToolbarStyles();
-
-  // Log a message to confirm the toolbar was created
-  console.log("Toolbar created and injected!");
-
-  // Attach the event listeners for the toolbar buttons
-  setupToolbarEventListeners();
+    document.body.appendChild(toolbar);
+    injectToolbarStyles();
+    setupToolbarEventListeners();
+  }
 }
 
 function injectToolbarStyles() {
-  const style = document.createElement("style");
-  style.textContent = `
-    .toolbar {
-      display: flex;
-      flex-direction: column;
-      flex-wrap: nowrap;
-      position: absolute;
-      z-index: 21000 !important;
-      background-color: var(--toolbarBg, #ffffff); /* Fallback color */
-      height: 340px;
-      width: 50px;
-      border-radius: 15px;
-      filter: drop-shadow(0 0 0.4rem black);
-      row-gap: 20px;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      top: 0;
-      left: 0;
-      transform: scale(0.85);
-    }
+  if (!document.getElementById("toolbarStyles")) {
+    const style = document.createElement("style");
+    style.id = "toolbarStyles";
+    style.textContent = `
+      .toolbar {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        position: absolute;
+        z-index: 21000 !important;
+        background-color: var(--toolbarBg, #ffffff);
+        height: 340px;
+        width: 50px;
+        border-radius: 15px;
+        filter: drop-shadow(0 0 0.4rem black);
+        row-gap: 20px;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        top: 0;
+        left: 0;
+        transform: scale(0.85);
+      }
 
-    .toolbar button {
-      background: none;
-      border: none;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: inherit;
-      cursor: pointer;
-      outline: none;
-    }
+      .toolbar button {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        outline: none;
+      }
 
-    #iconOne {
-      width: 30px;
-      height: 30px;
-    }
+      #iconOne {
+        width: 30px;
+        height: 30px;
+      }
 
-    #iconTwo {
-      width: 22px;
-      height: 22px;
-    }
+      #iconTwo {
+        width: 22px;
+        height: 22px;
+      }
 
-    #iconThree {
-      width: 30px;
-      height: 32px;
-    }
+      #iconThree {
+        width: 30px;
+        height: 32px;
+      }
 
-    #iconFour {
-      width: 25px;
-      height: 25px;
-      background-color: #cb2b9b;
-      border-radius: 50%;
-      filter: drop-shadow(0 0 0.2rem black);
-    }
+      #iconFour {
+        width: 25px;
+        height: 25px;
+        background-color: #cb2b9b;
+        border-radius: 50%;
+        filter: drop-shadow(0 0 0.2rem black);
+      }
 
-    #iconFive {
-      width: 25px;
-      height: 25px;
-      align-self: center;
-    }
+      #iconFive {
+        width: 25px;
+        height: 25px;
+        align-self: center;
+      }
 
-    #iconSix {
-      width: 25px;
-      height: 25px;
-      align-self: center;
-    }
+      #iconSix {
+        width: 25px;
+        height: 25px;
+        align-self: center;
+      }
 
-    #iconSeven {
-      width: 20px;
-      height: 30px;
-      align-self: center;
-    }
-  `;
-  document.head.appendChild(style);
+      #iconSeven {
+        width: 20px;
+        height: 30px;
+        align-self: center;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 function setupToolbarEventListeners() {

@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
 	const editImage = "../imgs/edit.png"; // Path to the edit image
 	const otherImage = "../imgs/editActive.png"; // Path to the other image
 	const squares = document.querySelectorAll(".dashStickSquare");
+	const toolbar = document.querySelector(".toolbar");
+
+	toolbar.style.display = "none";
 
 	// Array of colors
 	const colors = [
@@ -16,7 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	toggleButton.addEventListener("click", () => {
 		const img = toggleButton.querySelector("img");
+		const activeEdit = img.src.includes("editActive.png");
+
 		img.src = img.src.includes("edit.png") ? otherImage : editImage;
+
+		toolbar.style.display = activeEdit ? "none" : "flex";
 	});
 
 	// Shuffle the colors array (optional, to randomize the order)

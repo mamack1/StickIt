@@ -51,6 +51,7 @@ interface Note {
 	color: string;
 	position: { top: number; left: number };
 	innerhtml: string;
+	url: string;
 }
 
 function generateUniqueId2(): string {
@@ -128,6 +129,7 @@ function handleCreateNoteRequest2() {
                 <button class="close-note" style="position: absolute; top: 5px; right: 5px; background-color: yellow; color: black; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">X</button>
             </div>
         `,
+		url: window.location.href,
 	};
 
 	createNewNote2(noteData);

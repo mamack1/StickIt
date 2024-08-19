@@ -109,8 +109,8 @@ function makeDraggable(handle: HTMLElement, noteHost: HTMLElement) {
 
 	document.addEventListener("mousemove", (event) => {
 		if (isDragging) {
-			const newX = event.clientX - offsetX;
-			const newY = event.clientY - offsetY;
+			const newX = event.clientX - offsetX + window.scrollX;
+			const newY = event.clientY - offsetY + window.scrollY;
 
 			noteHost.style.left = `${newX}px`;
 			noteHost.style.top = `${newY}px`;

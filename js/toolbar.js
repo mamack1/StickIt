@@ -15,15 +15,27 @@
 
 // // Event listeners for button clicks
 // document.getElementById("iconOne").addEventListener("click", function () {
-//   toggleImage("iconOne", "../imgs/Move.png", "../imgs/MoveRed.png");
+//   toggleImage(
+//     "iconOne",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/Move.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/MoveRed.png?raw=true"
+//   );
 // });
 
 // document.getElementById("iconTwo").addEventListener("click", function () {
-//   toggleImage("iconTwo", "../imgs/text.png", "../imgs/textRed.png");
+//   toggleImage(
+//     "iconTwo",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/text.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/textRed.png?raw=true"
+//   );
 // });
 
 // document.getElementById("iconThree").addEventListener("click", function () {
-//   toggleImage("iconThree", "../imgs/eraser.png", "../imgs/eraserRed.png");
+//   toggleImage(
+//     "iconThree",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/eraser.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/eraserRed.png?raw=true"
+//   );
 // });
 
 // // Color wheel
@@ -39,13 +51,25 @@
 // });
 
 // document.getElementById("iconFive").addEventListener("click", function () {
-//   toggleImage("iconFive", "../imgs/undo.png", "../imgs/undoRed.png");
+//   toggleImage(
+//     "iconFive",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/undo.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/undoRed.png?raw=true"
+//   );
 // });
 
 // document.getElementById("iconSix").addEventListener("click", function () {
-//   toggleImage("iconSix", "../imgs/redo.png", "../imgs/redoRed.png");
+//   toggleImage(
+//     "iconSix",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/redo.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/redoRed.png?raw=true"
+//   );
 // });
 
 // document.getElementById("iconSeven").addEventListener("click", function () {
-//   toggleImage("iconSeven", "../imgs/saveic.png", "../imgs/saveRed.png");
+//   toggleImage(
+//     "iconSeven",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/saveic.png?raw=true",
+//     "https://github.com/JacksonBair/StickIt/blob/beta/imgs/saveRed.png?raw=true"
+//   );
 // });

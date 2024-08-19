@@ -231,26 +231,26 @@ function injectToolbar() {
 
     toolbar.innerHTML = `
       <button id="iconOne">
-        <img src="../imgs/Move.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/Move.png?raw=true" alt="icon" />
       </button>
       <button id="iconTwo">
-        <img src="../imgs/text.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/text.png?raw=true" alt="icon" />
       </button>
       <button id="iconThree">
-        <img src="../imgs/eraser.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/eraser.png?raw=true" alt="icon" />
       </button>
       <button id="iconFour">
         <div alt="circle"></div>
       </button>
       <input type="color" id="colorPicker" style="display: none;" />
       <button id="iconFive">
-        <img src="../imgs/undo.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/undo.png?raw=true" alt="icon" />
       </button>
       <button id="iconSix">
-        <img src="../imgs/redo.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/redo.png?raw=true" alt="icon" />
       </button>
       <button id="iconSeven">
-        <img src="../imgs/saveic.png" alt="icon" />
+        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/saveic.png?raw=true" alt="icon" />
       </button>
     `;
 

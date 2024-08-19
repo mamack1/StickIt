@@ -133,10 +133,12 @@ function addNoteToArray(stringyData) {
     let parsedData = JSON.parse(stringyData);
     const values = Object.values(parsedData);
     values.forEach((value) => {
-        console.log(value);
-        // noteList.push(noteValue);
+        let noteValue = value;
+        console.log(noteValue);
+        noteList.push(noteValue);
+        createNewNote2(noteValue);
     });
-    // console.log(parsedData);
+    console.log(noteList);
 }
 function clearStorage() {
     for (let i = 0; i < noteList.length; i++) {

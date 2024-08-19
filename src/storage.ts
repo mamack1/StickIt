@@ -166,11 +166,13 @@ function retrieveNote() {
 function addNoteToArray(stringyData: string) {
 	let parsedData = JSON.parse(stringyData);
 	const values = Object.values(parsedData);
-	values.forEach((value) => {
-		console.log(value);
-		// noteList.push(noteValue);
+	values.forEach((value: any) => {
+		let noteValue: Note = value
+		console.log(noteValue);
+		noteList.push(noteValue);
+		createNewNote2(noteValue);
 	});
-	// console.log(parsedData);
+	console.log(noteList);
 }
 
 function clearStorage() {

@@ -10,12 +10,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 const button = target;
                 const square = button.parentElement;
                 const color = (square === null || square === void 0 ? void 0 : square.getAttribute("noteColor")) || "#FFFFFF";
-                chrome.runtime.sendMessage({ action: "createNote", color: color }, (response) => {
+                chrome.runtime.sendMessage({ action: "getCurrentTabUrl" }, (response) => {
                     if (response.success) {
-                        console.log("Note creation message sent successfully");
+                        const currentUrl = response.url;
+                        chrome.runtime.sendMessage({ action: "createNote", color: color, url: currentUrl }, (response) => {
+                            if (response.success) {
+                                console.log("Note creation message sent successfully");
+                            }
+                            else {
+                                console.error("Error creating note:", response.error);
+                            }
+                        });
                     }
                     else {
-                        console.error("Error creating note:", response.error);
+                        console.error("Error getting current tab URL:", response.error);
                     }
                 });
             }

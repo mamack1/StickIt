@@ -131,8 +131,12 @@ function retrieveNote() {
 }
 function addNoteToArray(stringyData) {
     let parsedData = JSON.parse(stringyData);
-    noteList.push(parsedData);
-    console.log(parsedData);
+    const values = Object.values(parsedData);
+    values.forEach(value => {
+        console.log(value);
+        // noteList.push(noteValue);
+    });
+    // console.log(parsedData);
 }
 function clearStorage() {
     for (let i = 0; i < noteList.length; i++) {

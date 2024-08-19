@@ -120,8 +120,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				if (tabs && tabs.length > 0 && typeof tabs[0].id === "number") {
 					const tabId = tabs[0].id;
 					if (tabId !== undefined) {
-						checkAndInjectScript(tabId, request);
-						sendResponse({ success: true });
+						chrome.tabs.get(tabId, (tab) => {
+							if (chrome.runtime.lastError) {
+								console.error(
+									"Error getting tab details:",
+									chrome.runtime.lastError
+								);
+								sendResponse({
+									success: false,
+									error: "Failed to get tab details",
+								});
+								return;
+							}
+
+							const noteRequest = {
+								...request,
+								url: tab.url,
+							};
+
+							checkAndInjectScript(tabId, noteRequest);
+							sendResponse({ success: true });
+						});
 						return true;
 					} else {
 						console.error("No active tab found");
@@ -130,6 +149,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				} else {
 					console.error("No active tab found");
 					sendResponse({ success: false, error: "No active tab found" });
+				}
+			})
+			.catch((error) => {
+				console.error("Error querying tabs:", error);
+				sendResponse({ success: false, error });
+			});
+
+		return true;
+	}
+
+	if (request.action === "getCurrentTabUrl") {
+		chrome.tabs
+			.query({ active: true, currentWindow: true })
+			.then((tabs) => {
+				if (tabs && tabs.length > 0 && typeof tabs[0].url === "string") {
+					sendResponse({ success: true, url: tabs[0].url });
+				} else {
+					sendResponse({ success: false, error: "No URL found" });
 				}
 			})
 			.catch((error) => {

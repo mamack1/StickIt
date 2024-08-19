@@ -6,6 +6,7 @@ interface Note {
 	color: string;
 	position: { top: number; left: number };
 	innerhtml: string;
+	url: string;
 }
 
 // //TODO: fix possible matching ids
@@ -134,6 +135,7 @@ function handleCreateNoteRequest(color: string) {
                 <button class="close-note">X</button>
             </div>
         `,
+		url: window.location.href,
 	};
 
 	createNewNote(noteData);

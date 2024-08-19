@@ -103,6 +103,7 @@ function handleCreateNoteRequest(color) {
                 <button class="close-note">X</button>
             </div>
         `,
+        url: window.location.href,
     };
     createNewNote(noteData);
 }

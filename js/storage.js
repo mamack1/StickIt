@@ -103,7 +103,7 @@ function handleCreateNoteRequest2() {
     createNewNote2(noteData);
     // TODO: Stringigying the note for stoage testing
     noteList.push(noteData);
-    console.log(noteList);
+    // console.log(noteList);
     convertNoteToJson();
 }
 ;
@@ -131,9 +131,8 @@ function retrieveNote() {
 }
 function addNoteToArray(stringyData) {
     let parsedData = JSON.parse(stringyData);
-    let note = parsedData;
-    noteList.push(note);
-    console.log(noteList);
+    noteList.push(parsedData);
+    console.log(parsedData);
 }
 function clearStorage() {
     for (let i = 0; i < noteList.length; i++) {

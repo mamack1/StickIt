@@ -95,13 +95,30 @@ function createNoteElement(noteData: Note): HTMLElement {
 	return noteHost;
 }
 // TODO: CLEAR FROM STORAGE WHEN CLOSED
-function setupCloseButton(noteHost: HTMLElement) { 
+function setupCloseButton(noteHost: HTMLElement) {
 	const closeButton = noteHost.shadowRoot?.querySelector(
 		".close-note"
 	) as HTMLButtonElement;
+
 	if (closeButton) {
 		closeButton.addEventListener("click", () => {
-			document.body.removeChild(noteHost);
+			const noteId = noteHost.getAttribute("data-note-id");
+
+			if (noteId) {
+				// Remove the note from storage
+				chrome.storage.local.remove(noteId, () => {
+					console.log(`Note id: ${noteId} removed from storage.`);
+				});
+
+				// Remove the note from the page
+				document.body.removeChild(noteHost);
+
+				//Remove the note from the noteList array if needed
+				const noteIndex = noteList.findIndex((note) => note.id === noteId);
+				if (noteIndex !== -1) {
+					noteList.splice(noteIndex, 1);
+				}
+			}
 		});
 	}
 }
@@ -223,7 +240,7 @@ function retrieveNote() {
 		});
 		console.log(noteList);
 	});
-} 
+}
 
 // Keep but have duplicate checking
 function addNoteToArray(stringyData: string) {

@@ -9,12 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Array of colors
 	const colors = [
-		"#FF5733",
-		"#33FF57",
-		"#3357FF",
-		"#F333FF",
-		"#FF33A0",
-		"#33FFF5",
+		"#ed622f", // Orange
+		"#33FF57", // Green
+		"#486bf7", // Blue
+		"#b35cf2", // Purple
+		"#f25ce1", // Pink
+		"#33FFF5", // Light Blue
+		"#f5e342", // Yellow
+		"#31ebbf", // Turquoise
+		"#f71414", // Red
+		"#b8b6b6", // Grey
+		"#358253", // Forest
 	];
 
 	toggleButton.addEventListener("click", () => {

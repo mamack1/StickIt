@@ -68,6 +68,10 @@ function createNoteElement(noteData: Note): HTMLElement {
 		textarea.style.resize = "none";
 		textarea.style.outline = "none";
 		textarea.style.color = "black";
+
+		textarea.addEventListener("input", () => {
+			storeNote();
+		});
 	}
 
 	const closeButton = noteContent.querySelector(
@@ -94,7 +98,7 @@ function createNoteElement(noteData: Note): HTMLElement {
 	makeDraggable(handle, noteHost);
 	return noteHost;
 }
-// TODO: CLEAR FROM STORAGE WHEN CLOSED
+
 function setupCloseButton(noteHost: HTMLElement) {
 	const closeButton = noteHost.shadowRoot?.querySelector(
 		".close-note"
@@ -147,6 +151,8 @@ function makeDraggable(handle: HTMLElement, noteHost: HTMLElement) {
 	document.addEventListener("mouseup", () => {
 		isDragging = false;
 		handle.style.cursor = "grab";
+
+		storeNote();
 	});
 }
 

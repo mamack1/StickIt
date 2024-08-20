@@ -1,10 +1,9 @@
-// //TODO: Remove unnecessary console logs
+// DOMContentLoaded Event listener establishes note buttons in order to retrieve color of the note selected, then current url and proceeds to send the createNote message including those two parameters
 document.addEventListener("DOMContentLoaded", () => {
 	const noteParent = document.getElementById("noteParent");
 
 	if (noteParent) {
 		function handleClick(event: MouseEvent) {
-			console.log("EVENT LISTENER TRIGGERED!!!");
 			const target = event.target as HTMLElement;
 
 			if (target.matches(".createNoteBtn")) {
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
 								{ action: "createNote", color: color, url: currentUrl },
 								(response) => {
 									if (response.success) {
-										console.log("Note creation message sent successfully");
 									} else {
 										console.error("Error creating note:", response.error);
 									}
@@ -36,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		}
 
+		// Eventlistener removed and added in order to prevent the eventlistener from stacking, which caused multiple note creations on click
 		noteParent.removeEventListener("click", handleClick);
 
 		noteParent.addEventListener("click", handleClick);

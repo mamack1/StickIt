@@ -5,6 +5,7 @@ function generateUniqueId() {
 }
 function createNewNote(noteData) {
     const noteElement = createNoteElement(noteData);
+    noteElement.setAttribute("data-note-id", noteData.id);
     document.body.appendChild(noteElement);
 }
 function createNoteElement(noteData) {
@@ -37,24 +38,29 @@ function createNoteElement(noteData) {
     handle.style.zIndex = "2147483647";
     noteContent.appendChild(handle);
     const textarea = noteContent.querySelector(".note-content");
-    textarea.style.width = "100%";
-    textarea.style.height = "100px";
-    textarea.style.backgroundColor = noteData.color;
-    textarea.style.border = "none";
-    textarea.style.resize = "none";
-    textarea.style.outline = "none";
-    textarea.style.color = "black";
+    if (textarea) {
+        textarea.value = noteData.text;
+        textarea.style.width = "100%";
+        textarea.style.height = "100px";
+        textarea.style.backgroundColor = noteData.color;
+        textarea.style.border = "none";
+        textarea.style.resize = "none";
+        textarea.style.outline = "none";
+        textarea.style.color = "black";
+    }
     const closeButton = noteContent.querySelector(".close-note");
-    closeButton.style.position = "absolute";
-    closeButton.style.top = "5px";
-    closeButton.style.right = "5px";
-    closeButton.style.backgroundColor = noteData.color;
-    closeButton.style.color = "black";
-    closeButton.style.border = "none";
-    closeButton.style.borderRadius = "50%";
-    closeButton.style.width = "20px";
-    closeButton.style.height = "20px";
-    closeButton.style.cursor = "pointer";
+    if (closeButton) {
+        closeButton.style.position = "absolute";
+        closeButton.style.top = "5px";
+        closeButton.style.right = "5px";
+        closeButton.style.backgroundColor = noteData.color;
+        closeButton.style.color = "black";
+        closeButton.style.border = "none";
+        closeButton.style.borderRadius = "50%";
+        closeButton.style.width = "20px";
+        closeButton.style.height = "20px";
+        closeButton.style.cursor = "pointer";
+    }
     shadowRoot.appendChild(noteContent);
     document.body.appendChild(noteHost);
     setupCloseButton(noteHost);
@@ -99,10 +105,11 @@ function handleCreateNoteRequest(color) {
         position: { top: 100, left: 700 },
         innerhtml: `
             <div class="note" style="padding: 10px;">
-                <textarea class="note-content">New Note!!!!</textarea>
+                <textarea class="note-content"></textarea>
                 <button class="close-note">X</button>
             </div>
         `,
+        text: "NOTEEEE!",
         url: window.location.href,
     };
     createNewNote(noteData);

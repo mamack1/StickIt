@@ -67,6 +67,7 @@ function createNoteElement(noteData) {
     makeDraggable(handle, noteHost);
     return noteHost;
 }
+// TODO: CLEAR FROM STORAGE WHEN CLOSED
 function setupCloseButton(noteHost) {
     var _a;
     const closeButton = (_a = noteHost.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(".close-note");
@@ -113,6 +114,8 @@ function handleCreateNoteRequest(color) {
         url: window.location.href,
     };
     createNewNote(noteData);
+    noteList.push(noteData);
+    storeNote();
 }
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "createNote") {
@@ -122,3 +125,71 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true;
     }
 });
+/**
+Storage Functions below
+*/
+function storeNote() {
+    noteList.forEach((note) => {
+        const noteElement = document.querySelector(`[data-note-id="${note.id}"]`);
+        if (noteElement) {
+            const shadowRoot = noteElement.shadowRoot;
+            const noteContent = shadowRoot === null || shadowRoot === void 0 ? void 0 : shadowRoot.querySelector(".note-content");
+            if (noteContent) {
+                note.text = noteContent.value.trim();
+            }
+            const noteRect = noteElement.getBoundingClientRect();
+            note.position = {
+                top: noteRect.top + window.scrollY,
+                left: noteRect.left + window.scrollX,
+            };
+        }
+    });
+    convertNoteToJson();
+}
+// Required for uploading notes
+function convertNoteToJson() {
+    const notesObject = {};
+    noteList.forEach((note) => {
+        notesObject[note.id] = note;
+    });
+    chrome.storage.local.set(notesObject, () => {
+        console.log("Notes have been saved:", notesObject);
+    });
+}
+// Loop through NoteList, and pull notes that match URL
+function createNoteFromStorage(result) {
+    let note = JSON.parse(result);
+    console.log("running createNoteFromStorage");
+    console.log(note);
+    createNewNote(note);
+}
+function retrieveNote() {
+    console.log("RetrieveNote is running");
+    chrome.storage.local.get(null, (result) => {
+        const notes = Object.values(result);
+        notes.forEach((note) => {
+            noteList.push(note);
+            createNewNote(note);
+        });
+        console.log(noteList);
+    });
+}
+// Keep but have duplicate checking
+function addNoteToArray(stringyData) {
+    let parsedData = JSON.parse(stringyData);
+    const values = Object.values(parsedData);
+    values.forEach((value) => {
+        let noteValue = value;
+        console.log(noteValue);
+        noteList.push(noteValue);
+        createNewNote(noteValue);
+    });
+    console.log(noteList);
+}
+function clearStorage() {
+    noteList.length = 0; // Clear noteList
+    chrome.storage.local.clear(() => {
+        console.log("All keys cleared");
+    });
+}
+const noteList = new Array();

@@ -20,6 +20,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		"#f71414", // Red
 		"#b8b6b6", // Grey
 		"#358253", // Forest
+		// Original Pallet
+		//     "#FF5733",
+		//     "#33FF57",
+		//     "#3357FF",
+		//     "#F333FF",
+		//     "#FF33A0",
+		//     "#33FFF5",
 	];
 
 	toggleButton.addEventListener("click", () => {

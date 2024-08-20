@@ -1,12 +1,4 @@
-/*
-installation
-startup
-idle
-shutdown
-*/
-
-// //TODO: Make ability for multiple instances
-// //TODO: Clean Up Console Logs
+// This function checks the session storage to see if the content script has been injected in the web page
 function getInjectionState(tabId: number): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.get([`scriptInjected_${tabId}`], (result) => {
@@ -23,6 +15,7 @@ function getInjectionState(tabId: number): Promise<boolean> {
 	});
 }
 
+// This function sets the injection state to true
 function setInjectionState(tabId: number, state: boolean): Promise<void> {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.set({ [`scriptInjected_${tabId}`]: state }, () => {
@@ -36,6 +29,7 @@ function setInjectionState(tabId: number, state: boolean): Promise<void> {
 	});
 }
 
+// This function removes the ijectionstate from the session storage
 function removeInjectionState(tabId: number): Promise<void> {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.remove([`scriptInjected_${tabId}`], () => {
@@ -49,6 +43,8 @@ function removeInjectionState(tabId: number): Promise<void> {
 	});
 }
 
+// Check and inject script retrieves the injection state of the current tab, if it is injected it returns, if it is not injected
+// it will inject the content script into the page
 function checkAndInjectScript(tabId: number, request: any) {
 	getInjectionState(tabId)
 		.then((isInjected) => {
@@ -99,19 +95,7 @@ function checkAndInjectScript(tabId: number, request: any) {
 		});
 }
 
-chrome.runtime.onSuspend.addListener(() => {
-	console.log(
-		"Service worker is being suspended. Clearing script injection state."
-	);
-	chrome.storage.session.clear(() => {
-		if (chrome.runtime.lastError) {
-			console.error("Error clearing storage:", chrome.runtime.lastError);
-		} else {
-			console.log("Storage cleared.");
-		}
-	});
-});
-
+// Event listener that calls create note functions when the createNote message is received, the tabid and the request including the current url is passed to checkandinject, which passes the message to the content script calling the function
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "createNote") {
 		chrome.tabs
@@ -159,6 +143,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		return true;
 	}
 
+	// This request action responds with the url of the current tab
 	if (request.action === "getCurrentTabUrl") {
 		chrome.tabs
 			.query({ active: true, currentWindow: true })
@@ -181,18 +166,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	return true;
 });
 
+// complete is called when the page is done loading. The content script is injected, then retrieve notes is called to display the notes matching the current url, and then the content script is removed
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	if (changeInfo.status === "complete" && tab.url) {
-		// Inject the note content script
 		chrome.scripting.executeScript(
 			{
 				target: { tabId },
 				files: ["js/injectNoteScript.js"],
 			},
 			() => {
-				// Retrieve notes after the script is injected
 				chrome.tabs.sendMessage(tabId, { action: "retrieveNote" }, () => {
-					// Remove the injection state after notes are retrieved
 					removeInjectionState(tabId)
 						.then(() => {
 							console.log(`Injection state removed for tab ${tabId}`);
@@ -209,6 +192,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	}
 });
 
+// This listener was intended to re-activate the service worker, may not be necesarry
 chrome.action.onClicked.addListener(() => {
 	console.log("Extension icon clicked, activating service worker.");
 	chrome.runtime.sendMessage({ action: "keepAlive" });

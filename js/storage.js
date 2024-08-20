@@ -3,11 +3,22 @@ const noteList = new Array();
 // On idle store notes in local, and sync
 // On shutdown store notes in local, and sync
 function storeNote() {
-    // for(let note of noteList) {
-    // 	for(let item in Object.entries(note)) {
-    // 		console.log(`${item}: ${(note as {[key: string]: string})[item]}`);
-    // 	}
-    // }
+    noteList.forEach((note) => {
+        const noteElement = document.querySelector(`[data-note-id="${note.id}"]`);
+        if (noteElement) {
+            const shadowRoot = noteElement.shadowRoot;
+            const noteContent = shadowRoot === null || shadowRoot === void 0 ? void 0 : shadowRoot.querySelector(".note-content");
+            if (noteContent) {
+                note.text = noteContent.value.trim();
+            }
+            const noteRect = noteElement.getBoundingClientRect();
+            note.position = {
+                top: noteRect.top + window.scrollY,
+                left: noteRect.left + window.scrollX,
+            };
+        }
+    });
+    convertNoteToJson();
 }
 const storeNoteButton = document.getElementById("storeNote");
 if (storeNoteButton) {
@@ -32,7 +43,7 @@ else {
 }
 const testNoteCreation = document.getElementById("testNoteCreation");
 if (testNoteCreation) {
-    testNoteCreation.addEventListener("click", handleCreateNoteRequest2);
+    testNoteCreation.addEventListener("click", () => handleCreateNoteRequest2("yellow"));
 }
 else {
     console.error("Test Note Creation button not found");
@@ -40,80 +51,132 @@ else {
 function generateUniqueId2() {
     return Math.random().toString(36).substr(2, 9);
 }
-// Function to create and display the note
 function createNewNote2(noteData) {
     const noteElement = createNoteElement2(noteData);
+    noteElement.setAttribute("data-note-id", noteData.id);
+    const shadowRoot = noteElement.shadowRoot;
+    const noteContent = shadowRoot === null || shadowRoot === void 0 ? void 0 : shadowRoot.querySelector(".note-content");
+    if (noteContent) {
+        noteContent.value = noteData.text;
+    }
     document.body.appendChild(noteElement);
 }
-// Function to create HTML element for the note
 function createNoteElement2(noteData) {
-    const noteContainer = document.createElement("div");
-    noteContainer.innerHTML = noteData.innerhtml.trim();
-    const noteElement = noteContainer.firstChild;
-    noteElement.style.backgroundColor = noteData.color;
-    noteElement.style.top = `${noteData.position.top}px`;
-    noteElement.style.left = `${noteData.position.left}px`;
-    makeDraggable2(noteElement);
-    setupCloseButton2(noteElement);
-    return noteElement;
+    const noteHost = document.createElement("div");
+    noteHost.style.position = "absolute";
+    noteHost.style.top = `${noteData.position.top}px`;
+    noteHost.style.left = `${noteData.position.left}px`;
+    noteHost.style.width = "200px";
+    noteHost.style.height = "150px";
+    noteHost.style.zIndex = "2147483646";
+    const shadowRoot = noteHost.attachShadow({ mode: "open" });
+    const noteContent = document.createElement("div");
+    noteContent.innerHTML = noteData.innerhtml.trim();
+    noteContent.style.backgroundColor = noteData.color;
+    noteContent.style.padding = "10px";
+    noteContent.style.borderRadius = "5px";
+    noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+    const handle = document.createElement("div");
+    handle.style.width = "50px";
+    handle.style.height = "5px";
+    handle.style.marginTop = "5px";
+    handle.style.marginBottom = "5px";
+    handle.style.backgroundColor = "grey";
+    handle.style.borderRadius = "10px";
+    handle.style.position = "absolute";
+    handle.style.top = "5px";
+    handle.style.left = "50%";
+    handle.style.transform = "translateX(-50%)";
+    handle.style.cursor = "grab";
+    handle.style.zIndex = "2147483647";
+    noteContent.appendChild(handle);
+    const textarea = noteContent.querySelector(".note-content");
+    if (textarea) {
+        textarea.value = noteData.text;
+        textarea.style.width = "100%";
+        textarea.style.height = "100px";
+        textarea.style.backgroundColor = noteData.color;
+        textarea.style.border = "none";
+        textarea.style.resize = "none";
+        textarea.style.outline = "none";
+        textarea.style.color = "black";
+    }
+    const closeButton = noteContent.querySelector(".close-note");
+    if (closeButton) {
+        closeButton.style.position = "absolute";
+        closeButton.style.top = "5px";
+        closeButton.style.right = "5px";
+        closeButton.style.backgroundColor = noteData.color;
+        closeButton.style.color = "black";
+        closeButton.style.border = "none";
+        closeButton.style.borderRadius = "50%";
+        closeButton.style.width = "20px";
+        closeButton.style.height = "20px";
+        closeButton.style.cursor = "pointer";
+    }
+    shadowRoot.appendChild(noteContent);
+    document.body.appendChild(noteHost);
+    setupCloseButton2(noteHost);
+    makeDraggable2(handle, noteHost);
+    return noteHost;
 }
-// Function to set up the close button for the note
-function setupCloseButton2(noteElement) {
-    const closeButton = noteElement.querySelector(".close-note");
+function setupCloseButton2(noteHost) {
+    var _a;
+    const closeButton = (_a = noteHost.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(".close-note");
     if (closeButton) {
         closeButton.addEventListener("click", () => {
-            document.body.removeChild(noteElement);
+            document.body.removeChild(noteHost);
         });
     }
 }
-// Function to make the note draggable
-function makeDraggable2(element) {
+function makeDraggable2(handle, noteHost) {
     let offsetX, offsetY;
     let isDragging = false;
-    element.addEventListener("mousedown", (event) => {
-        offsetX = event.clientX - element.getBoundingClientRect().left;
-        offsetY = event.clientY - element.getBoundingClientRect().top;
+    handle.addEventListener("mousedown", (event) => {
+        offsetX = event.clientX - noteHost.getBoundingClientRect().left;
+        offsetY = event.clientY - noteHost.getBoundingClientRect().top;
         isDragging = true;
-        element.style.cursor = "grabbing";
+        handle.style.cursor = "grabbing";
     });
     document.addEventListener("mousemove", (event) => {
         if (isDragging) {
-            element.style.left = `${event.clientX - offsetX}px`;
-            element.style.top = `${event.clientY - offsetY}px`;
+            const newX = event.clientX - offsetX + window.scrollX;
+            const newY = event.clientY - offsetY + window.scrollY;
+            noteHost.style.left = `${newX}px`;
+            noteHost.style.top = `${newY}px`;
         }
     });
     document.addEventListener("mouseup", () => {
         isDragging = false;
-        element.style.cursor = "grab";
+        handle.style.cursor = "grab";
     });
 }
-// This function will be called by the background script when requested
-function handleCreateNoteRequest2() {
+function handleCreateNoteRequest2(color) {
     const noteData = {
         id: generateUniqueId2(),
-        color: "yellow",
+        color: color,
         position: { top: 100, left: 100 },
         innerhtml: `
-            <div class="note" style="background-color: yellow; position: absolute; top: 100px; left: 100px; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);">
-                <textarea class="note-content" style="width: 100%; height: 100px; background-color: yellow; border: none; resize: none; outline: none; color: black;">New Note!!!!</textarea>
-                <button class="close-note" style="position: absolute; top: 5px; right: 5px; background-color: yellow; color: black; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">X</button>
+            <div class="note" style="padding: 10px;">
+                <textarea class="note-content">Abernathy</textarea>
+                <button class="close-note">X</button>
             </div>
         `,
+        text: "NOTEEEE!",
         url: window.location.href,
     };
     createNewNote2(noteData);
-    // TODO: Stringigying the note for stoage testing
     noteList.push(noteData);
-    // console.log(noteList);
-    convertNoteToJson();
+    storeNote();
 }
 function convertNoteToJson() {
-    for (let i = 0; i < noteList.length; i++) {
-        let note = noteList[i];
-        let jsonString = JSON.stringify(note);
-        chrome.storage.local.set({ [note.id]: note });
-        console.log(jsonString);
-    }
+    const notesObject = {};
+    noteList.forEach((note) => {
+        notesObject[note.id] = note;
+    });
+    chrome.storage.local.set(notesObject, () => {
+        console.log("Notes have been saved:", notesObject);
+    });
 }
 function createNoteFromStorage(result) {
     let note = JSON.parse(result);
@@ -122,11 +185,14 @@ function createNoteFromStorage(result) {
     createNewNote2(note);
 }
 function retrieveNote() {
-    console.log("RetriveNote is running");
-    chrome.storage.local.get(null).then((result) => {
-        let stringyData = JSON.stringify(result);
-        // console.log(stringyData);
-        addNoteToArray(stringyData);
+    console.log("RetrieveNote is running");
+    chrome.storage.local.get(null, (result) => {
+        const notes = Object.values(result);
+        notes.forEach((note) => {
+            noteList.push(note);
+            createNewNote2(note);
+        });
+        console.log(noteList);
     });
 }
 function addNoteToArray(stringyData) {
@@ -141,10 +207,7 @@ function addNoteToArray(stringyData) {
     console.log(noteList);
 }
 function clearStorage() {
-    for (let i = 0; i < noteList.length; i++) {
-        noteList.pop();
-    }
-    console.log(noteList);
+    noteList.length = 0; // Clear noteList
     chrome.storage.local.clear(() => {
         console.log("All keys cleared");
     });

@@ -16,6 +16,7 @@ function createNoteElement(noteData) {
     noteHost.style.width = "200px";
     noteHost.style.height = "150px";
     noteHost.style.zIndex = "2147483646";
+    // Attaches shadow to note in order to protect from webpage css and js influence
     const shadowRoot = noteHost.attachShadow({ mode: "open" });
     const noteContent = document.createElement("div");
     noteContent.innerHTML = noteData.innerhtml.trim();
@@ -83,7 +84,7 @@ function setupCloseButton(noteHost) {
                 });
                 // Remove the note from the page
                 document.body.removeChild(noteHost);
-                //Remove the note from the noteList array if needed
+                //Remove the note from the noteList array
                 const noteIndex = noteList.findIndex((note) => note.id === noteId);
                 if (noteIndex !== -1) {
                     noteList.splice(noteIndex, 1);
@@ -126,7 +127,7 @@ function handleCreateNoteRequest(color) {
                 <button class="close-note">X</button>
             </div>
         `,
-        text: "NOTEEEE!",
+        text: "StickIt",
         url: window.location.href,
     };
     createNewNote(noteData);
@@ -136,7 +137,7 @@ function handleCreateNoteRequest(color) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "createNote") {
         handleCreateNoteRequest(request.color);
-        console.log("NOTE INJECTED");
+        console.log("New Note Injected");
         sendResponse({ success: true });
         return true;
     }

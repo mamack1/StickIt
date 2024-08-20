@@ -158,14 +158,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ success: false, error: "Unknown action" });
     return true;
 });
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if (changeInfo.status === "complete") {
-        removeInjectionState(tabId)
-            .then(() => {
-            console.log(`Injection state removed for tab ${tabId}`);
-        })
-            .catch((error) => {
-            console.error(`Error removing injection state for tab ${tabId}:`, error);
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === "complete" && tab.url) {
+        // Inject the note content script
+        chrome.scripting.executeScript({
+            target: { tabId },
+            files: ["js/injectNoteScript.js"],
+        }, () => {
+            // Retrieve notes after the script is injected
+            chrome.tabs.sendMessage(tabId, { action: "retrieveNote" }, () => {
+                // Remove the injection state after notes are retrieved
+                removeInjectionState(tabId)
+                    .then(() => {
+                    console.log(`Injection state removed for tab ${tabId}`);
+                })
+                    .catch((error) => {
+                    console.error(`Error removing injection state for tab ${tabId}:`, error);
+                });
+            });
         });
     }
 });

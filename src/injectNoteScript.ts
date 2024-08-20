@@ -1,6 +1,5 @@
 // //TODO: Remove unnecessary Console Logs
 // //TODO: Clean Up
-// //TODO: track url location?
 interface Note {
 	id: string;
 	color: string;
@@ -236,14 +235,27 @@ function createNoteFromStorage(result: string) {
 	createNewNote(note);
 }
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.action === "retrieveNote") {
+		retrieveNote();
+	}
+});
+
 function retrieveNote() {
 	console.log("RetrieveNote is running");
 	chrome.storage.local.get(null, (result) => {
 		const notes = Object.values(result) as Note[];
-		notes.forEach((note) => {
+		const currentUrl = window.location.href;
+
+		// Filter notes to only include those that match the current URL
+		const matchingNotes = notes.filter((note) => note.url === currentUrl);
+
+		matchingNotes.forEach((note) => {
 			noteList.push(note);
 			createNewNote(note);
 		});
+
+		console.log("Notes retrieved for this page:", matchingNotes);
 		console.log(noteList);
 	});
 }

@@ -179,14 +179,23 @@ function createNoteFromStorage(result) {
     console.log(note);
     createNewNote(note);
 }
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "retrieveNote") {
+        retrieveNote();
+    }
+});
 function retrieveNote() {
     console.log("RetrieveNote is running");
     chrome.storage.local.get(null, (result) => {
         const notes = Object.values(result);
-        notes.forEach((note) => {
+        const currentUrl = window.location.href;
+        // Filter notes to only include those that match the current URL
+        const matchingNotes = notes.filter((note) => note.url === currentUrl);
+        matchingNotes.forEach((note) => {
             noteList.push(note);
             createNewNote(note);
         });
+        console.log("Notes retrieved for this page:", matchingNotes);
         console.log(noteList);
     });
 }

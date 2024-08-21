@@ -127,6 +127,14 @@ function setupCloseButton(noteHost) {
         if (noteIndex !== -1) {
           noteList.splice(noteIndex, 1);
         }
+        // Hide the toolbar if the closed note was the selected one
+        if (selectedNoteId === noteId) {
+          const toolbar = document.querySelector(".toolbar");
+          if (toolbar) {
+            toolbar.style.display = "none";
+            selectedNoteId = null; // Reset the selected note ID
+          }
+        }
       }
     });
   }
@@ -271,7 +279,14 @@ function clearStorage() {
 }
 
 // Inject the toolbar into the page
+// Inject the toolbar into the page
 function injectToolbar() {
+  // Check if the toolbar already exists
+  if (document.querySelector(".toolbar")) {
+    console.log("Toolbar already exists. Skipping injection.");
+    return; // Exit the function if the toolbar already exists
+  }
+
   const toolbar = document.createElement("div");
   toolbar.className = "toolbar";
   toolbar.style.position = "absolute";
@@ -369,6 +384,7 @@ function injectToolbar() {
   console.log("Toolbar injected");
   setupToolbarInteractions(toolbar);
 }
+
 function setupToolbarInteractions(toolbar) {
   document.addEventListener("click", (event) => {
     const note = event.target.closest(".note-host");
@@ -466,108 +482,6 @@ function setupToolbarInteractions(toolbar) {
     // Handle save icon action
   });
 }
-
-// function setupToolbarInteractions(toolbar) {
-//   document.addEventListener("click", (event) => {
-//     const note = event.target.closest(".note-host");
-//     const iconFour = document.getElementById("iconFour");
-//     const colorPicker = document.querySelector(".color-picker"); // Replace with the actual selector for the color picker
-
-//     if (note) {
-//       selectedNoteId = note.getAttribute("data-note-id");
-//       const noteRect = note.getBoundingClientRect();
-//       toolbar.style.top = `${noteRect.top}px`;
-//       toolbar.style.left = `${
-//         noteRect.left + window.scrollX - toolbar.offsetWidth - 10
-//       }px`;
-//       toolbar.style.display = "flex"; // Show the toolbar
-//       console.log(`Toolbar shown for note ID: ${selectedNoteId}`);
-//     } else if (iconFour.contains(event.target)) {
-//       // Do nothing if the click is on iconFour or the color picker
-//       toolbar.style.display = "flex";
-//     } else {
-//       toolbar.style.display = "none"; // Hide the toolbar if clicked outside
-//     }
-//   });
-
-//   toolbar.querySelector("#iconOne").addEventListener("click", () => {
-//     console.log("Move icon clicked");
-//     // Handle move icon action
-//   });
-
-//   toolbar.querySelector("#iconTwo").addEventListener("click", () => {
-//     console.log("Text icon clicked");
-//     // Handle text icon action
-//   });
-
-//   toolbar.querySelector("#iconThree").addEventListener("click", () => {
-//     console.log("Eraser icon clicked");
-//     clearStorage();
-//   });
-
-//   const iconFour = document.getElementById("iconFour");
-//   const colorPicker = document.getElementById("colorPicker");
-
-//   iconFour.addEventListener("click", () => {
-//     console.log("Circle icon clicked");
-
-//     // Make sure the colorPicker is visible
-//     colorPicker.style.display = "block"; // Ensure it is visible
-//     colorPicker.style.position = "absolute";
-//     colorPicker.style.borderRadius = "50%";
-//     colorPicker.style.width = "30px";
-//     colorPicker.style.height = "30px";
-
-//     // colorPicker.style;
-//     colorPicker.click();
-//   });
-
-//   // Change the circle's background color when the color is picked
-//   colorPicker.addEventListener("input", (event) => {
-//     const selectedColor = event.target.value;
-//     console.log("Color picked:", selectedColor); // For debugging
-
-//     if (selectedNoteId) {
-//       // Find the note with the selectedNoteId
-//       const noteElement = document.querySelector(
-//         `[data-note-id="${selectedNoteId}"]`
-//       );
-//       if (noteElement) {
-//         const shadowRoot = noteElement.shadowRoot;
-//         const noteContent = shadowRoot?.querySelector(".note-content");
-//         if (noteContent) {
-//           noteContent.style.backgroundColor = selectedColor; // Apply the color to the note's inner content
-//         }
-
-//         // Update the note data in the noteList
-//         const note = noteList.find((n) => n.id === selectedNoteId);
-//         if (note) {
-//           note.color = selectedColor; // Update the color in noteList
-//           storeNote(); // Save the changes
-//         }
-//       }
-//     }
-
-//     colorPicker.style.display = "none"; // Hide it again after selecting color
-//   });
-
-//   toolbar.querySelector("#iconFive").addEventListener("click", () => {
-//     console.log("Undo icon clicked");
-//     // Handle undo icon action
-//   });
-
-//   toolbar.querySelector("#iconSix").addEventListener("click", () => {
-//     console.log("Redo icon clicked");
-//     // Handle redo icon action
-//   });
-
-//   toolbar.querySelector("#iconSeven").addEventListener("click", () => {
-//     console.log("Save icon clicked");
-//     // Handle save icon action
-//   });
-// }
-
-// Initialize the toolbar
 injectToolbar();
 
 // Retrieve notes when the page loads

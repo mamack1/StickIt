@@ -197,3 +197,22 @@ chrome.action.onClicked.addListener(() => {
 	console.log("Extension icon clicked, activating service worker.");
 	chrome.runtime.sendMessage({ action: "keepAlive" });
 });
+
+//popup check
+// background.js
+chrome.runtime.onInstalled.addListener(() => {
+	chrome.storage.session.set({ popupShown: false });
+});
+
+chrome.action.onClicked.addListener(() => {
+	chrome.storage.session.get("popupShown", (result) => {
+		if (result.popupShown) {
+			// If the popup has been shown in this session, open the dashboard directly
+			chrome.tabs.create({ url: "pages/dashboard.html" });
+		} else {
+			// If the popup hasn't been shown, show the popup and set the flag
+			chrome.storage.session.set({ popupShown: true });
+			chrome.action.openPopup(); // Show the popup
+		}
+	});
+});

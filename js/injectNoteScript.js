@@ -314,15 +314,14 @@ function injectToolbar() {
             z-index: 2147483647;
             background-color: #FFFFFF;
             filter: drop-shadow(0 0 0.4rem black);
-            height: 300px;
+            height: max-content;
             width: 25px;
             border-radius: 10px;
             row-gap: 10px;
             justify-content: center;
             align-items: center;
-            padding: 5px;
+            padding: 10px;
             transform: scale(0.85);
-            margin-top: -65px;
         }
     
         .toolbar button {

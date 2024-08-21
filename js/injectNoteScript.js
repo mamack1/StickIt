@@ -6,6 +6,7 @@ function generateUniqueId() {
 
 function createNewNote(noteData) {
   const noteElement = createNoteElement(noteData);
+  noteElement.setAttribute("data-note-id", noteData.id);
   document.body.appendChild(noteElement);
 }
 
@@ -78,22 +79,20 @@ function createNoteElement(noteData) {
   noteHost.style.width = "200px";
   noteHost.style.height = "150px";
   noteHost.style.zIndex = "2147483646";
-
+  // Attaches shadow to note in order to protect from webpage css and js influence
+  const shadowRoot = noteHost.attachShadow({ mode: "open" });
   const noteContent = document.createElement("div");
   noteContent.innerHTML = noteData.innerhtml.trim();
+  noteContent.style.backgroundColor = noteData.color;
   noteContent.style.padding = "10px";
-  noteContent.style.backgroundColor = noteData.color; // Set background color for noteContent
-
-  // Logging for debugging
-  console.log("Setting background color:", noteData.color);
-  console.log("noteContent styles:", noteContent.style.cssText);
-
+  noteContent.style.borderRadius = "5px";
+  noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
   const handle = document.createElement("div");
   handle.style.width = "50px";
   handle.style.height = "5px";
   handle.style.marginTop = "5px";
   handle.style.marginBottom = "5px";
-  handle.style.backgroundColor = noteData.color;
+  handle.style.backgroundColor = "grey";
   handle.style.borderRadius = "10px";
   handle.style.position = "absolute";
   handle.style.top = "5px";
@@ -102,24 +101,26 @@ function createNoteElement(noteData) {
   handle.style.cursor = "grab";
   handle.style.zIndex = "2147483647";
   noteContent.appendChild(handle);
-
   const textarea = noteContent.querySelector(".note-content");
   if (textarea) {
+    textarea.value = noteData.text;
     textarea.style.width = "100%";
     textarea.style.height = "100px";
-    textarea.style.backgroundColor = noteData.color; // Set background color for textarea
+    textarea.style.backgroundColor = noteData.color;
     textarea.style.border = "none";
     textarea.style.resize = "none";
     textarea.style.outline = "none";
     textarea.style.color = "black";
+    textarea.addEventListener("input", () => {
+      storeNote();
+    });
   }
-
   const closeButton = noteContent.querySelector(".close-note");
   if (closeButton) {
     closeButton.style.position = "absolute";
     closeButton.style.top = "5px";
     closeButton.style.right = "5px";
-    closeButton.style.backgroundColor = "#f12a2a";
+    closeButton.style.backgroundColor = noteData.color;
     closeButton.style.color = "black";
     closeButton.style.border = "none";
     closeButton.style.borderRadius = "50%";
@@ -127,12 +128,10 @@ function createNoteElement(noteData) {
     closeButton.style.height = "20px";
     closeButton.style.cursor = "pointer";
   }
-
-  noteHost.appendChild(noteContent);
-  injectNoteStyles();
+  shadowRoot.appendChild(noteContent);
+  document.body.appendChild(noteHost);
   setupCloseButton(noteHost);
   makeDraggable(handle, noteHost);
-
   return noteHost;
 }
 
@@ -171,10 +170,27 @@ function injectNoteStyles() {
 }
 
 function setupCloseButton(noteHost) {
-  const closeButton = noteHost.querySelector(".close-note");
+  var _a;
+  const closeButton =
+    (_a = noteHost.shadowRoot) === null || _a === void 0
+      ? void 0
+      : _a.querySelector(".close-note");
   if (closeButton) {
     closeButton.addEventListener("click", () => {
-      document.body.removeChild(noteHost);
+      const noteId = noteHost.getAttribute("data-note-id");
+      if (noteId) {
+        // Remove the note from storage
+        chrome.storage.local.remove(noteId, () => {
+          console.log(`Note id: ${noteId} removed from storage.`);
+        });
+        // Remove the note from the page
+        document.body.removeChild(noteHost);
+        //Remove the note from the noteList array
+        const noteIndex = noteList.findIndex((note) => note.id === noteId);
+        if (noteIndex !== -1) {
+          noteList.splice(noteIndex, 1);
+        }
+      }
     });
   }
 }
@@ -190,8 +206,8 @@ function makeDraggable(handle, noteHost) {
   });
   document.addEventListener("mousemove", (event) => {
     if (isDragging) {
-      const newX = event.clientX - offsetX;
-      const newY = event.clientY - offsetY;
+      const newX = event.clientX - offsetX + window.scrollX;
+      const newY = event.clientY - offsetY + window.scrollY;
       noteHost.style.left = `${newX}px`;
       noteHost.style.top = `${newY}px`;
     }
@@ -199,6 +215,7 @@ function makeDraggable(handle, noteHost) {
   document.addEventListener("mouseup", () => {
     isDragging = false;
     handle.style.cursor = "grab";
+    storeNote();
   });
 }
 
@@ -208,168 +225,103 @@ function handleCreateNoteRequest(color) {
     color: color,
     position: { top: 100, left: 700 },
     innerhtml: `
-      <div class="note" style="padding: 10px;">
-        <textarea class="note-content" placeholder="New Note!!!!"></textarea>
-        <button class="close-note">X</button>
-      </div>
-    `,
+            <div class="note" style="padding: 10px;">
+                <textarea class="note-content"></textarea>
+                <button class="close-note">X</button>
+            </div>
+        `,
+    text: "StickIt",
+    url: window.location.href,
   };
-  noteData.className = "dashStickSquare";
   createNewNote(noteData);
-
-  // Inject the toolbar if it's not already injected
-  if (!document.getElementById("toolbar")) {
-    injectToolbar();
-  }
+  noteList.push(noteData);
+  storeNote();
 }
-
-function injectToolbar() {
-  if (!document.getElementById("toolbar")) {
-    const toolbar = document.createElement("div");
-    toolbar.className = "toolbar";
-    toolbar.id = "toolbar";
-
-    toolbar.innerHTML = `
-      <button id="iconOne">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/Move.png?raw=true" alt="icon" />
-      </button>
-      <button id="iconTwo">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/text.png?raw=true" alt="icon" />
-      </button>
-      <button id="iconThree">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/eraser.png?raw=true" alt="icon" />
-      </button>
-      <button id="iconFour">
-        <div alt="circle"></div>
-      </button>
-      <input type="color" id="colorPicker" style="display: none;" />
-      <button id="iconFive">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/undo.png?raw=true" alt="icon" />
-      </button>
-      <button id="iconSix">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/redo.png?raw=true" alt="icon" />
-      </button>
-      <button id="iconSeven">
-        <img src="https://github.com/JacksonBair/StickIt/blob/beta/imgs/saveic.png?raw=true" alt="icon" />
-      </button>
-    `;
-
-    document.body.appendChild(toolbar);
-    injectToolbarStyles();
-    setupToolbarEventListeners();
-  }
-}
-
-function injectToolbarStyles() {
-  if (!document.getElementById("toolbarStyles")) {
-    const style = document.createElement("style");
-    style.id = "toolbarStyles";
-    style.textContent = `
-      .toolbar {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        position: absolute;
-        z-index: 21000 !important;
-        background-color: var(--toolbarBg, #ffffff);
-        height: 340px;
-        width: 50px;
-        border-radius: 15px;
-        filter: drop-shadow(0 0 0.4rem black);
-        row-gap: 20px;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-        top: 0;
-        left: 0;
-        transform: scale(0.85);
-      }
-
-      .toolbar button {
-        background: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        font: inherit;
-        color: inherit;
-        cursor: pointer;
-        outline: none;
-      }
-
-      #iconOne {
-        width: 30px;
-        height: 30px;
-      }
-
-      #iconTwo {
-        width: 22px;
-        height: 22px;
-      }
-
-      #iconThree {
-        width: 30px;
-        height: 32px;
-      }
-
-      #iconFour {
-        width: 25px;
-        height: 25px;
-        background-color: #cb2b9b;
-        border-radius: 50%;
-        filter: drop-shadow(0 0 0.2rem black);
-      }
-
-      #iconFive {
-        width: 25px;
-        height: 25px;
-        align-self: center;
-      }
-
-      #iconSix {
-        width: 25px;
-        height: 25px;
-        align-self: center;
-      }
-
-      #iconSeven {
-        width: 20px;
-        height: 30px;
-        align-self: center;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-}
-
-function setupToolbarEventListeners() {
-  // Add event listeners for toolbar buttons here
-}
-// chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//   if (tabs.length === 0) {
-//     console.error("No active tab found");
-//     return;
-//   }
-//   const activeTab = tabs[0].id;
-//   chrome.tabs.sendMessage(
-//     activeTab,
-//     { action: "createNote", color: color },
-//     (response) => {
-//       if (response.success) {
-//         console.log("Note creation message sent successfully");
-//       } else {
-//         console.error("Error creating note:", response.error);
-//       }
-//     }
-//   );
-// });
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "createNote") {
     handleCreateNoteRequest(request.color);
-    console.log("NOTE INJECTED");
+    console.log("New Note Injected");
     sendResponse({ success: true });
     return true;
-  } else {
-    sendResponse({ success: false, error: "Invalid action" });
   }
 });
+/**
+Storage Functions below
+*/
+function storeNote() {
+  noteList.forEach((note) => {
+    const noteElement = document.querySelector(`[data-note-id="${note.id}"]`);
+    if (noteElement) {
+      const shadowRoot = noteElement.shadowRoot;
+      const noteContent =
+        shadowRoot === null || shadowRoot === void 0
+          ? void 0
+          : shadowRoot.querySelector(".note-content");
+      if (noteContent) {
+        note.text = noteContent.value.trim();
+      }
+      const noteRect = noteElement.getBoundingClientRect();
+      note.position = {
+        top: noteRect.top + window.scrollY,
+        left: noteRect.left + window.scrollX,
+      };
+    }
+  });
+  convertNoteToJson();
+}
+// Required for uploading notes
+function convertNoteToJson() {
+  const notesObject = {};
+  noteList.forEach((note) => {
+    notesObject[note.id] = note;
+  });
+  chrome.storage.local.set(notesObject, () => {
+    console.log("Notes have been saved:", notesObject);
+  });
+}
+// Loop through NoteList, and pull notes that match URL
+function createNoteFromStorage(result) {
+  let note = JSON.parse(result);
+  console.log("running createNoteFromStorage");
+  console.log(note);
+  createNewNote(note);
+}
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "retrieveNote") {
+    retrieveNote();
+  }
+});
+function retrieveNote() {
+  console.log("RetrieveNote is running");
+  chrome.storage.local.get(null, (result) => {
+    const notes = Object.values(result);
+    const currentUrl = window.location.href;
+    // Filter notes to only include those that match the current URL
+    const matchingNotes = notes.filter((note) => note.url === currentUrl);
+    matchingNotes.forEach((note) => {
+      noteList.push(note);
+      createNewNote(note);
+    });
+    console.log("Notes retrieved for this page:", matchingNotes);
+    console.log(noteList);
+  });
+}
+// Keep but have duplicate checking
+function addNoteToArray(stringyData) {
+  let parsedData = JSON.parse(stringyData);
+  const values = Object.values(parsedData);
+  values.forEach((value) => {
+    let noteValue = value;
+    console.log(noteValue);
+    noteList.push(noteValue);
+    createNewNote(noteValue);
+  });
+  console.log(noteList);
+}
+function clearStorage() {
+  noteList.length = 0; // Clear noteList
+  chrome.storage.local.clear(() => {
+    console.log("All keys cleared");
+  });
+}
+const noteList = new Array();

@@ -1,11 +1,10 @@
-// //TODO: Remove unnecessary Console Logs
-// //TODO: Clean Up
-// //TODO: track url location?
 interface Note {
 	id: string;
 	color: string;
 	position: { top: number; left: number };
 	innerhtml: string;
+	text: string;
+	url: string;
 }
 
 // //TODO: fix possible matching ids
@@ -15,6 +14,7 @@ function generateUniqueId(): string {
 
 function createNewNote(noteData: Note) {
 	const noteElement = createNoteElement(noteData);
+	noteElement.setAttribute("data-note-id", noteData.id);
 	document.body.appendChild(noteElement);
 }
 
@@ -27,6 +27,7 @@ function createNoteElement(noteData: Note): HTMLElement {
 	noteHost.style.height = "150px";
 	noteHost.style.zIndex = "2147483646";
 
+	// Attaches shadow to note in order to protect from webpage css and js influence
 	const shadowRoot = noteHost.attachShadow({ mode: "open" });
 
 	const noteContent = document.createElement("div");
@@ -55,27 +56,38 @@ function createNoteElement(noteData: Note): HTMLElement {
 	const textarea = noteContent.querySelector(
 		".note-content"
 	) as HTMLTextAreaElement;
-	textarea.style.width = "100%";
-	textarea.style.height = "100px";
-	textarea.style.backgroundColor = noteData.color;
-	textarea.style.border = "none";
-	textarea.style.resize = "none";
-	textarea.style.outline = "none";
-	textarea.style.color = "black";
+
+	if (textarea) {
+		textarea.value = noteData.text;
+		textarea.style.width = "100%";
+		textarea.style.height = "100px";
+		textarea.style.backgroundColor = noteData.color;
+		textarea.style.border = "none";
+		textarea.style.resize = "none";
+		textarea.style.outline = "none";
+		textarea.style.color = "black";
+
+		textarea.addEventListener("input", () => {
+			storeNote();
+		});
+	}
 
 	const closeButton = noteContent.querySelector(
 		".close-note"
 	) as HTMLButtonElement;
-	closeButton.style.position = "absolute";
-	closeButton.style.top = "5px";
-	closeButton.style.right = "5px";
-	closeButton.style.backgroundColor = noteData.color;
-	closeButton.style.color = "black";
-	closeButton.style.border = "none";
-	closeButton.style.borderRadius = "50%";
-	closeButton.style.width = "20px";
-	closeButton.style.height = "20px";
-	closeButton.style.cursor = "pointer";
+
+	if (closeButton) {
+		closeButton.style.position = "absolute";
+		closeButton.style.top = "5px";
+		closeButton.style.right = "5px";
+		closeButton.style.backgroundColor = noteData.color;
+		closeButton.style.color = "black";
+		closeButton.style.border = "none";
+		closeButton.style.borderRadius = "50%";
+		closeButton.style.width = "20px";
+		closeButton.style.height = "20px";
+		closeButton.style.cursor = "pointer";
+	}
 
 	shadowRoot.appendChild(noteContent);
 	document.body.appendChild(noteHost);
@@ -89,9 +101,26 @@ function setupCloseButton(noteHost: HTMLElement) {
 	const closeButton = noteHost.shadowRoot?.querySelector(
 		".close-note"
 	) as HTMLButtonElement;
+
 	if (closeButton) {
 		closeButton.addEventListener("click", () => {
-			document.body.removeChild(noteHost);
+			const noteId = noteHost.getAttribute("data-note-id");
+
+			if (noteId) {
+				// Remove the note from storage
+				chrome.storage.local.remove(noteId, () => {
+					console.log(`Note id: ${noteId} removed from storage.`);
+				});
+
+				// Remove the note from the page
+				document.body.removeChild(noteHost);
+
+				//Remove the note from the noteList array
+				const noteIndex = noteList.findIndex((note) => note.id === noteId);
+				if (noteIndex !== -1) {
+					noteList.splice(noteIndex, 1);
+				}
+			}
 		});
 	}
 }
@@ -120,6 +149,8 @@ function makeDraggable(handle: HTMLElement, noteHost: HTMLElement) {
 	document.addEventListener("mouseup", () => {
 		isDragging = false;
 		handle.style.cursor = "grab";
+
+		storeNote();
 	});
 }
 
@@ -130,20 +161,122 @@ function handleCreateNoteRequest(color: string) {
 		position: { top: 100, left: 700 },
 		innerhtml: `
             <div class="note" style="padding: 10px;">
-                <textarea class="note-content">New Note!!!!</textarea>
+                <textarea class="note-content"></textarea>
                 <button class="close-note">X</button>
             </div>
         `,
+		text: "StickIt",
+		url: window.location.href,
 	};
 
 	createNewNote(noteData);
+	noteList.push(noteData);
+	storeNote();
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "createNote") {
 		handleCreateNoteRequest(request.color);
-		console.log("NOTE INJECTED");
+		console.log("New Note Injected");
 		sendResponse({ success: true });
 		return true;
 	}
 });
+
+/**
+Storage Functions below
+*/
+
+function storeNote() {
+	noteList.forEach((note) => {
+		const noteElement = document.querySelector(
+			`[data-note-id="${note.id}"]`
+		) as HTMLElement;
+
+		if (noteElement) {
+			const shadowRoot = noteElement.shadowRoot;
+			const noteContent = shadowRoot?.querySelector(
+				".note-content"
+			) as HTMLTextAreaElement;
+
+			if (noteContent) {
+				note.text = noteContent.value.trim();
+			}
+
+			const noteRect = noteElement.getBoundingClientRect();
+			note.position = {
+				top: noteRect.top + window.scrollY,
+				left: noteRect.left + window.scrollX,
+			};
+		}
+	});
+
+	convertNoteToJson();
+}
+
+// Required for uploading notes
+function convertNoteToJson() {
+	const notesObject: { [key: string]: Note } = {};
+	noteList.forEach((note) => {
+		notesObject[note.id] = note;
+	});
+
+	chrome.storage.local.set(notesObject, () => {
+		console.log("Notes have been saved:", notesObject);
+	});
+}
+
+// Loop through NoteList, and pull notes that match URL
+function createNoteFromStorage(result: string) {
+	let note: Note = JSON.parse(result);
+	console.log("running createNoteFromStorage");
+	console.log(note);
+	createNewNote(note);
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.action === "retrieveNote") {
+		retrieveNote();
+	}
+});
+
+function retrieveNote() {
+	console.log("RetrieveNote is running");
+	chrome.storage.local.get(null, (result) => {
+		const notes = Object.values(result) as Note[];
+		const currentUrl = window.location.href;
+
+		// Filter notes to only include those that match the current URL
+		const matchingNotes = notes.filter((note) => note.url === currentUrl);
+
+		matchingNotes.forEach((note) => {
+			noteList.push(note);
+			createNewNote(note);
+		});
+
+		console.log("Notes retrieved for this page:", matchingNotes);
+		console.log(noteList);
+	});
+}
+
+// Keep but have duplicate checking
+function addNoteToArray(stringyData: string) {
+	let parsedData = JSON.parse(stringyData);
+	const values = Object.values(parsedData);
+	values.forEach((value: any) => {
+		let noteValue: Note = value;
+		console.log(noteValue);
+		noteList.push(noteValue);
+		createNewNote(noteValue);
+	});
+	console.log(noteList);
+}
+
+function clearStorage() {
+	noteList.length = 0; // Clear noteList
+	chrome.storage.local.clear(() => {
+		console.log("All keys cleared");
+	});
+}
+
+const noteList = new Array<Note>();

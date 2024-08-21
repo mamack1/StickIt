@@ -342,15 +342,24 @@ function clearStorage(): void {
 
 // Inject the toolbar into the page
 function injectToolbar(): void {
-	if (document.querySelector(".toolbar")) {
+	if (document.querySelector(".toolbar-host")) {
 		console.log("Toolbar already exists. Skipping injection.");
 		return;
 	}
 
+	// Create a host for the shadow DOM
+	const toolbarHost = document.createElement("div");
+	toolbarHost.className = "toolbar-host";
+	toolbarHost.style.position = "absolute";
+	toolbarHost.style.display = "none";
+	toolbarHost.style.zIndex = "2147483647";
+
+	// Attach shadow DOM to the toolbar host
+	const shadowRoot = toolbarHost.attachShadow({ mode: "open" });
+
+	// Create the toolbar inside the shadow DOM
 	const toolbar = document.createElement("div");
 	toolbar.className = "toolbar";
-	toolbar.style.position = "absolute";
-	toolbar.style.display = "none";
 
 	toolbar.innerHTML = `
         <button id="iconOne"><img src="https://lh3.googleusercontent.com/pw/AP1GczN-DpPVU7JHUW8SjuCdo7DGznZVjj7Kjefci_1Mv23meMMoU5MhT3LADKU-uxUtcpY7oEXuxgXxP5l_x30qps5BU6gT3MEqEA2X8ascxKgEH4kXJSu6E6YeRHz6Vljv-qMFOhRoczxnW8aS4j6W_Lvq9A=w28-h28-s-no-gm?authuser=0" alt="icon" /></button>
@@ -365,27 +374,27 @@ function injectToolbar(): void {
         <button id="iconSeven"><img src="https://lh3.googleusercontent.com/pw/AP1GczOXOaZPfVnrtYqqYk_GH8xxcgQmRaT1oZ7uFSUi-sOXuKeLL6VQg24rK8_HfnQLYcXPTraX9Nw3ApjpX-IHZm-7EG4xk9hKZMxyI-AALjz5adj7zNne-aVx8DkKP7xZFfgK9jA0TpTBNoN8I4TDWIoUoQ=w17-h25-s-no-gm?authuser=0" alt="icon" /></button>
     `;
 
-	document.body.appendChild(toolbar);
+	shadowRoot.appendChild(toolbar);
 
+	// Apply isolated styles inside the shadow DOM
 	const style = document.createElement("style");
 	style.innerHTML = `
         .toolbar {
             display: flex;
             flex-direction: column;
-            flex-wrap: nowrap;
             position: absolute;
             z-index: 2147483647;
             background-color: #FFFFFF;
             filter: drop-shadow(0 0 0.4rem black);
-            height: 250px;
-            width: 45px;
+            height: 300px;
+            width: 25px;
             border-radius: 10px;
             row-gap: 10px;
             justify-content: center;
             align-items: center;
             padding: 5px;
             transform: scale(0.85);
-			margin-top: -65px;
+            margin-top: -65px;
         }
     
         .toolbar button {
@@ -399,9 +408,10 @@ function injectToolbar(): void {
             outline: none;
         }
     `;
-	document.head.appendChild(style);
+	shadowRoot.appendChild(style);
 
-	console.log("Toolbar injected");
+	document.body.appendChild(toolbarHost);
+
 	setupToolbarInteractions(toolbar);
 }
 
@@ -410,19 +420,23 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 		const note = (event.target as HTMLElement).closest<HTMLElement>(
 			".note-host"
 		);
-		const iconFour = document.getElementById("iconFour") as HTMLElement;
+		const iconFour = toolbar.shadowRoot?.querySelector(
+			"#iconFour"
+		) as HTMLElement;
 		const colorPicker =
-			document.querySelector<HTMLInputElement>(".color-picker");
+			toolbar.shadowRoot?.querySelector<HTMLInputElement>("#colorPicker");
 
 		if (note) {
 			selectedNoteId = note.getAttribute("data-note-id");
 			const noteRect = note.getBoundingClientRect();
-			toolbar.style.top = `${noteRect.top}px`;
-			toolbar.style.left = `${
-				noteRect.left + window.scrollX - toolbar.offsetWidth - 10
+			const toolbarHost = document.querySelector(
+				".toolbar-host"
+			) as HTMLElement;
+			toolbarHost.style.top = `${noteRect.top + window.scrollY}px`;
+			toolbarHost.style.left = `${
+				noteRect.left + window.scrollX - toolbarHost.offsetWidth - 10
 			}px`;
-			toolbar.style.display = "flex";
-			console.log(`Toolbar shown for note ID: ${selectedNoteId}`);
+			toolbarHost.style.display = "flex";
 		} else if (iconFour.contains(event.target as Node)) {
 			toolbar.style.display = "flex";
 		} else {
@@ -443,22 +457,25 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 		clearStorage();
 	});
 
-	const iconFour = document.getElementById("iconFour") as HTMLElement;
-	const colorPicker = document.getElementById(
-		"colorPicker"
-	) as HTMLInputElement;
+	const iconFour = toolbar.shadowRoot?.querySelector(
+		"#iconFour"
+	) as HTMLElement;
+	const colorPicker =
+		toolbar.shadowRoot?.querySelector<HTMLInputElement>("#colorPicker");
 
-	iconFour.addEventListener("click", () => {
-		console.log("Circle icon clicked");
-		colorPicker.style.display = "block";
-		colorPicker.style.position = "absolute";
-		colorPicker.style.borderRadius = "50%";
-		colorPicker.style.width = "30px";
-		colorPicker.style.height = "30px";
-		colorPicker.click();
+	iconFour?.addEventListener("click", () => {
+		if (colorPicker) {
+			console.log("Circle icon clicked");
+			colorPicker.style.display = "block";
+			colorPicker.style.position = "absolute";
+			colorPicker.style.borderRadius = "50%";
+			colorPicker.style.width = "30px";
+			colorPicker.style.height = "30px";
+			colorPicker.click();
+		}
 	});
 
-	colorPicker.addEventListener("input", (event) => {
+	colorPicker?.addEventListener("input", (event) => {
 		const selectedColor = (event.target as HTMLInputElement).value;
 		console.log("Color picked:", selectedColor);
 
@@ -467,10 +484,8 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 				`[data-note-id="${selectedNoteId}"]`
 			);
 			if (noteElement) {
-				// Access the shadow DOM of the note
 				const shadowRoot = noteElement.shadowRoot;
 				if (shadowRoot) {
-					// Update the note content background color
 					const noteContent =
 						shadowRoot.querySelector<HTMLElement>(".note-content");
 					if (noteContent) {
@@ -478,25 +493,23 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 					}
 				}
 
-				// Update the color in the note data and save the note
 				const note = noteList.find((n) => n.id === selectedNoteId);
 				if (note) {
-					note.color = selectedColor; // Update the color property of the Note object
-					storeNote(); // Save the updated note
+					note.color = selectedColor;
+					storeNote();
 
-					// Re-render the note to apply the changes immediately
 					const noteIndex = noteList.findIndex((n) => n.id === selectedNoteId);
 					if (noteIndex !== -1) {
-						// Remove the old note element
 						document.body.removeChild(noteElement);
-						// Create and insert the updated note element
 						createNewNote(noteList[noteIndex]);
 					}
 				}
 			}
 		}
 
-		colorPicker.style.display = "none";
+		if (colorPicker) {
+			colorPicker.style.display = "none";
+		}
 	});
 
 	toolbar.querySelector("#iconFive")?.addEventListener("click", () => {
@@ -514,11 +527,11 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 
 // Function to show the toolbar next to the selected note
 function showToolbar(noteHost: HTMLElement): void {
-	const toolbar = document.querySelector(".toolbar") as HTMLElement;
+	const toolbarHost = document.querySelector(".toolbar-host") as HTMLElement;
 	const noteRect = noteHost.getBoundingClientRect();
-	toolbar.style.top = `${noteRect.top + window.scrollY}px`;
-	toolbar.style.left = `${
-		noteRect.left + window.scrollX - toolbar.offsetWidth - 10
+	toolbarHost.style.top = `${noteRect.top + window.scrollY}px`;
+	toolbarHost.style.left = `${
+		noteRect.left + window.scrollX - toolbarHost.offsetWidth - 10
 	}px`;
-	toolbar.style.display = "flex";
+	toolbarHost.style.display = "flex";
 }

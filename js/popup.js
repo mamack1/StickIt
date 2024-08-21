@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 				// Add random delay and duration for each note
 				note.style.animationDelay = `${Math.random() * 4}s`;
-				note.style.animationDuration = `${2}s`; // Duration between 5s and 10s
+				note.style.animationDuration = `${3}s`; // Duration between 5s and 10s
 			}
 
 			splashBot.addEventListener("animationend", () => {

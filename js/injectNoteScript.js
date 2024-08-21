@@ -116,9 +116,8 @@ function makeDraggable(handle, noteHost) {
             const newY = event.clientY - offsetY + window.scrollY;
             noteHost.style.left = `${newX}px`;
             noteHost.style.top = `${newY}px`;
-            // Update the toolbar position while dragging
             if (selectedNoteId === noteHost.getAttribute("data-note-id")) {
-                showToolbar(noteHost);
+                showToolbar(noteHost, true);
             }
         }
     });
@@ -126,7 +125,6 @@ function makeDraggable(handle, noteHost) {
         if (isDragging) {
             isDragging = false;
             handle.style.cursor = "grab";
-            // Update the toolbar position after dragging ends
             showToolbar(noteHost);
             storeNote();
         }
@@ -249,6 +247,12 @@ function clearStorage() {
                 console.log(`Note element with ID: ${note.id} not found in DOM.`);
             }
         });
+        // Remove the toolbar element from the DOM
+        const toolbarHost = document.querySelector(".toolbar-host");
+        if (toolbarHost) {
+            document.body.removeChild(toolbarHost);
+            console.log("Toolbar removed from DOM.");
+        }
         // Update the noteList array to exclude the cleared notes
         noteList = noteList.filter((note) => note.url !== currentUrl);
         console.log(`Updated noteList:`, noteList);
@@ -313,7 +317,6 @@ function injectToolbar() {
             padding: 5px;
             transform: scale(0.85);
             margin-top: -65px;
-			border-right: 50px;
         }
     
         .toolbar button {
@@ -416,10 +419,20 @@ function setupToolbarInteractions(toolbar) {
     });
 }
 // Function to show the toolbar next to the selected note
-function showToolbar(noteHost) {
+function showToolbar(noteHost, isDragging = false) {
     const toolbarHost = document.querySelector(".toolbar-host");
     const noteRect = noteHost.getBoundingClientRect();
-    toolbarHost.style.top = `${noteRect.top + window.scrollY}px`;
-    toolbarHost.style.left = `${noteRect.left + window.scrollX - toolbarHost.offsetWidth - 10}px`;
+    const toolbarOffset = 50;
+    const topPosition = noteRect.top + window.scrollY;
+    const leftPosition = noteRect.left + window.scrollX - toolbarHost.offsetWidth - toolbarOffset;
+    toolbarHost.style.top = `${topPosition}px`;
+    if (isDragging) {
+        toolbarHost.style.left = `${leftPosition}px`;
+    }
+    else {
+        requestAnimationFrame(() => {
+            toolbarHost.style.left = `${leftPosition}px`;
+        });
+    }
     toolbarHost.style.display = "flex";
 }

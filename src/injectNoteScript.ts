@@ -155,9 +155,8 @@ function makeDraggable(handle: HTMLElement, noteHost: HTMLElement): void {
 			noteHost.style.left = `${newX}px`;
 			noteHost.style.top = `${newY}px`;
 
-			// Update the toolbar position while dragging
 			if (selectedNoteId === noteHost.getAttribute("data-note-id")) {
-				showToolbar(noteHost);
+				showToolbar(noteHost, true);
 			}
 		}
 	});
@@ -167,9 +166,7 @@ function makeDraggable(handle: HTMLElement, noteHost: HTMLElement): void {
 			isDragging = false;
 			handle.style.cursor = "grab";
 
-			// Update the toolbar position after dragging ends
 			showToolbar(noteHost);
-
 			storeNote();
 		}
 	});
@@ -322,6 +319,13 @@ function clearStorage(): void {
 				console.log(`Note element with ID: ${note.id} not found in DOM.`);
 			}
 		});
+
+		// Remove the toolbar element from the DOM
+		const toolbarHost = document.querySelector(".toolbar-host") as HTMLElement;
+		if (toolbarHost) {
+			document.body.removeChild(toolbarHost);
+			console.log("Toolbar removed from DOM.");
+		}
 
 		// Update the noteList array to exclude the cleared notes
 		noteList = noteList.filter((note) => note.url !== currentUrl);
@@ -526,12 +530,25 @@ function setupToolbarInteractions(toolbar: HTMLElement): void {
 }
 
 // Function to show the toolbar next to the selected note
-function showToolbar(noteHost: HTMLElement): void {
+function showToolbar(noteHost: HTMLElement, isDragging: boolean = false): void {
 	const toolbarHost = document.querySelector(".toolbar-host") as HTMLElement;
 	const noteRect = noteHost.getBoundingClientRect();
-	toolbarHost.style.top = `${noteRect.top + window.scrollY}px`;
-	toolbarHost.style.left = `${
-		noteRect.left + window.scrollX - toolbarHost.offsetWidth - 10
-	}px`;
+
+	const toolbarOffset = 50;
+
+	const topPosition = noteRect.top + window.scrollY;
+	const leftPosition =
+		noteRect.left + window.scrollX - toolbarHost.offsetWidth - toolbarOffset;
+
+	toolbarHost.style.top = `${topPosition}px`;
+
+	if (isDragging) {
+		toolbarHost.style.left = `${leftPosition}px`;
+	} else {
+		requestAnimationFrame(() => {
+			toolbarHost.style.left = `${leftPosition}px`;
+		});
+	}
+
 	toolbarHost.style.display = "flex";
 }

@@ -24,7 +24,7 @@ function createNoteElement(noteData) {
   noteHost.style.top = `${noteData.position.top}px`;
   noteHost.style.left = `${noteData.position.left}px`;
   noteHost.style.width = "200px";
-  noteHost.style.height = "150px";
+  noteHost.style.height = "208px";
   noteHost.style.zIndex = "2147483646";
 
   // Attach shadow DOM for encapsulated styles
@@ -32,7 +32,7 @@ function createNoteElement(noteData) {
   const noteContent = document.createElement("div");
   noteContent.innerHTML = noteData.innerhtml.trim();
   noteContent.style.backgroundColor = noteData.color;
-  noteContent.style.padding = "10px";
+
   noteContent.style.borderRadius = "5px";
   noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
 
@@ -40,6 +40,7 @@ function createNoteElement(noteData) {
   const handle = document.createElement("div");
   handle.style.width = "50px";
   handle.style.height = "5px";
+
   handle.style.backgroundColor = "grey";
   handle.style.borderRadius = "10px";
   handle.style.position = "absolute";
@@ -54,10 +55,15 @@ function createNoteElement(noteData) {
   const textarea = noteContent.querySelector(".note-content");
   if (textarea) {
     textarea.style.width = "100%";
-    textarea.style.height = "100px";
+    textarea.style.height = "120px";
     textarea.style.backgroundColor = noteData.color;
     textarea.style.border = "none";
+    textarea.style.position = "absolute";
+
     textarea.style.resize = "none";
+    noteContent.style.margin = "5px";
+    noteContent.style.marginBottom = "0px";
+    textarea.style.borderRadius = "10px";
     textarea.style.outline = "none";
     textarea.style.color = "black";
     textarea.addEventListener("input", () => {
@@ -70,9 +76,9 @@ function createNoteElement(noteData) {
   if (closeButton) {
     closeButton.style.position = "absolute";
     closeButton.style.top = "5px";
-    closeButton.style.right = "5px";
-    closeButton.style.backgroundColor = noteData.color;
-    closeButton.style.color = "black";
+    closeButton.style.right = "10px";
+    closeButton.style.backgroundColor = "red";
+    closeButton.style.color = "white";
     closeButton.style.border = "none";
     closeButton.style.borderRadius = "50%";
     closeButton.style.width = "20px";
@@ -81,10 +87,26 @@ function createNoteElement(noteData) {
   }
 
   shadowRoot.appendChild(noteContent);
-  document.body.appendChild(noteHost);
-  setupCloseButton(noteHost);
+  setupCloseButton(noteHost); // Call this to attach the close button event listener
   makeDraggable(handle, noteHost);
   return noteHost;
+}
+
+// Retrieve notes from storage
+function retrieveNote() {
+  console.log("RetrieveNote is running");
+  chrome.storage.local.get(null, (result) => {
+    const notes = Object.values(result);
+    const currentUrl = window.location.href;
+    const matchingNotes = notes.filter((note) => note.url === currentUrl);
+    matchingNotes.forEach((note) => {
+      noteList.push(note);
+      const noteElement = createNewNote(note); // Call createNewNote, which already handles setting up the note element and close button
+      setupCloseButton(noteElement); // Ensure the close button is properly set up
+    });
+    console.log("Notes retrieved for this page:", matchingNotes);
+    console.log(noteList);
+  });
 }
 
 // Setup functionality for the close button on a note
@@ -233,6 +255,7 @@ function injectToolbar() {
   const toolbar = document.createElement("div");
   toolbar.className = "toolbar";
   toolbar.style.position = "absolute";
+  toolbar.style.display = "none";
 
   toolbar.innerHTML = `
     <button id="iconOne"><img src="https://lh3.googleusercontent.com/pw/AP1GczN-DpPVU7JHUW8SjuCdo7DGznZVjj7Kjefci_1Mv23meMMoU5MhT3LADKU-uxUtcpY7oEXuxgXxP5l_x30qps5BU6gT3MEqEA2X8ascxKgEH4kXJSu6E6YeRHz6Vljv-qMFOhRoczxnW8aS4j6W_Lvq9A=w28-h28-s-no-gm?authuser=0" alt="icon" /></button>
@@ -240,8 +263,8 @@ function injectToolbar() {
     <button id="iconThree"><img src="https://lh3.googleusercontent.com/pw/AP1GczOkP35F0jlHxA9HWkJX2D4U3MIBJS8bu_t7qR6CdZ7qj71MJjj5YDQm4s_gJ8hzJxNsoMOLXkDkGUtr3wUSYoBlHcNp0rLbl6G87U1GPUgGCzEcJljf8fltocKRtRfx55UmmUsnFtFgIZz1F5yCSed0Hg=w22-h23-s-no-gm?authuser=0" alt="icon" /></button>
     <button id="iconFour">
       <div class="circle" style="width: 25px; height: 25px; background-color: #cb2b9b; border-radius: 50%;"></div>
-    </button>
-    <input type="color" id="colorPicker" style="display: none;" />
+             </button>
+       <input type="color" id="colorPicker" style="display: none;" />
     <button id="iconFive"><img src="https://lh3.googleusercontent.com/pw/AP1GczP3ClMcaB8B9roVfM6isgXQbU89122IPIAkV6zqVHYL-tmXtkKRuNw71HcuBlloJ2Vos4A8YRf00BszMXatJkd586K7WGUDqDBUXYVCPX5qi0SNzW92F8NIEfyeaOv8xfnSyJxW1U24Eh5cBgrD5iGvug=w20-h19-s-no-gm?authuser=0" alt="icon" /></button>
     <button id="iconSix"><img src="https://lh3.googleusercontent.com/pw/AP1GczPyAgWHA6YU862EKjCaMnOOWN1Al0XvYgkI1dF7MHcRerJJLvRAVyg-oyTDNu5O80pZ6JRoVI4J4tOjNM2Ny8yWtdGyEJdGODDISGXFXoOAot2_DOEYtITrfY7Ow9X-TL0o5LsjGGEWuXxmiBfDqm7UFg=w20-h20-s-no-gm?authuser=0" alt="icon" /></button>
     <button id="iconSeven"><img src="https://lh3.googleusercontent.com/pw/AP1GczOXOaZPfVnrtYqqYk_GH8xxcgQmRaT1oZ7uFSUi-sOXuKeLL6VQg24rK8_HfnQLYcXPTraX9Nw3ApjpX-IHZm-7EG4xk9hKZMxyI-AALjz5adj7zNne-aVx8DkKP7xZFfgK9jA0TpTBNoN8I4TDWIoUoQ=w17-h25-s-no-gm?authuser=0" alt="icon" /></button>
@@ -327,10 +350,12 @@ function injectToolbar() {
   setupToolbarInteractions(toolbar);
 }
 
-// Set up toolbar interactions
 function setupToolbarInteractions(toolbar) {
   document.addEventListener("click", (event) => {
     const note = event.target.closest(".note-host");
+    const iconFour = document.getElementById("iconFour");
+    const colorPicker = document.querySelector(".color-picker"); // Replace with the actual selector for the color picker
+
     if (note) {
       selectedNoteId = note.getAttribute("data-note-id");
       const noteRect = note.getBoundingClientRect();
@@ -340,6 +365,9 @@ function setupToolbarInteractions(toolbar) {
       }px`;
       toolbar.style.display = "flex"; // Show the toolbar
       console.log(`Toolbar shown for note ID: ${selectedNoteId}`);
+    } else if (iconFour.contains(event.target)) {
+      // Do nothing if the click is on iconFour or the color picker
+      toolbar.style.display = "flex";
     } else {
       toolbar.style.display = "none"; // Hide the toolbar if clicked outside
     }
@@ -360,18 +388,50 @@ function setupToolbarInteractions(toolbar) {
     clearStorage();
   });
 
-  toolbar.querySelector("#iconFour").addEventListener("click", () => {
-    console.log("Circle icon clicked");
-    const iconFour = toolbar.querySelector("#iconFour");
-    const colorPicker = toolbar.querySelector("#colorPicker");
-    colorPicker.click();
+  const iconFour = document.getElementById("iconFour");
+  const colorPicker = document.getElementById("colorPicker");
 
-    // Change the circle's background color when the color is picked
-    colorPicker.addEventListener("input", (event) => {
-      const selectedColor = event.target.value;
-      console.log("Color picked:", selectedColor); // For debugging
-      iconFour.querySelector(".circle").style.backgroundColor = selectedColor; // Apply the color
-    });
+  iconFour.addEventListener("click", () => {
+    console.log("Circle icon clicked");
+
+    // Make sure the colorPicker is visible
+    colorPicker.style.display = "block"; // Ensure it is visible
+    colorPicker.style.position = "absolute";
+    colorPicker.style.borderRadius = "50%";
+    colorPicker.style.width = "30px";
+    colorPicker.style.height = "30px";
+
+    // colorPicker.style;
+    colorPicker.click();
+  });
+
+  // Change the circle's background color when the color is picked
+  colorPicker.addEventListener("input", (event) => {
+    const selectedColor = event.target.value;
+    console.log("Color picked:", selectedColor); // For debugging
+
+    if (selectedNoteId) {
+      // Find the note with the selectedNoteId
+      const noteElement = document.querySelector(
+        `[data-note-id="${selectedNoteId}"]`
+      );
+      if (noteElement) {
+        const shadowRoot = noteElement.shadowRoot;
+        const noteContent = shadowRoot?.querySelector(".note-content");
+        if (noteContent) {
+          noteContent.style.backgroundColor = selectedColor; // Apply the color to the note's inner content
+        }
+
+        // Update the note data in the noteList
+        const note = noteList.find((n) => n.id === selectedNoteId);
+        if (note) {
+          note.color = selectedColor; // Update the color in noteList
+          storeNote(); // Save the changes
+        }
+      }
+    }
+
+    colorPicker.style.display = "none"; // Hide it again after selecting color
   });
 
   toolbar.querySelector("#iconFive").addEventListener("click", () => {

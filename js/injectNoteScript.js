@@ -237,17 +237,37 @@ function retrieveNote() {
 }
 
 // Clear all stored notes
+// Clear notes on the current page only
 function clearStorage() {
-  noteList.forEach((note) => {
-    const noteElement = document.querySelector(`[data-note-id="${note.id}"]`);
-    if (noteElement) {
-      document.body.removeChild(noteElement);
-    }
-  });
-  noteList.length = 0; // Clear noteList
-  chrome.storage.local.clear(() => {
-    console.log("All keys cleared");
-  });
+  const currentUrl = window.location.href;
+
+  // Filter out notes that match the current page URL
+  const notesToClear = noteList.filter((note) => note.url === currentUrl);
+
+  // Confirm with the user before clearing notes
+  const confirmClear = window.confirm(
+    "Are you sure you want to erase all notes on this page?"
+  );
+
+  if (confirmClear) {
+    notesToClear.forEach((note) => {
+      const noteElement = document.querySelector(`[data-note-id="${note.id}"]`);
+      if (noteElement) {
+        document.body.removeChild(noteElement);
+      }
+    });
+
+    // Remove notes from noteList
+    noteList = noteList.filter((note) => note.url !== currentUrl);
+
+    // Remove notes from storage
+    const noteIdsToRemove = notesToClear.map((note) => note.id);
+    chrome.storage.local.remove(noteIdsToRemove, () => {
+      console.log("All notes for this page cleared");
+    });
+  } else {
+    console.log("Clear action canceled by the user");
+  }
 }
 
 // Inject the toolbar into the page
@@ -260,7 +280,7 @@ function injectToolbar() {
   toolbar.innerHTML = `
     <button id="iconOne"><img src="https://lh3.googleusercontent.com/pw/AP1GczN-DpPVU7JHUW8SjuCdo7DGznZVjj7Kjefci_1Mv23meMMoU5MhT3LADKU-uxUtcpY7oEXuxgXxP5l_x30qps5BU6gT3MEqEA2X8ascxKgEH4kXJSu6E6YeRHz6Vljv-qMFOhRoczxnW8aS4j6W_Lvq9A=w28-h28-s-no-gm?authuser=0" alt="icon" /></button>
     <button id="iconTwo"><img src="https://lh3.googleusercontent.com/pw/AP1GczMsy3w6gWVwnjJRZazZig0vllcuCLZ2I7eNq855K2kZ8AF78vQQuLD08JeGPsvnm10di_9r2wr1sEs44zUATv6lJPI0cXEJB89M2BfnDooTO-1F7jDpB7ipZn4Zj8O9o6yI_mrpsHOZmkfQm6bQcan5iA=w20-h21-s-no-gm?authuser=0" alt="icon" /></button>
-    <button id="iconThree"><img src="https://lh3.googleusercontent.com/pw/AP1GczOkP35F0jlHxA9HWkJX2D4U3MIBJS8bu_t7qR6CdZ7qj71MJjj5YDQm4s_gJ8hzJxNsoMOLXkDkGUtr3wUSYoBlHcNp0rLbl6G87U1GPUgGCzEcJljf8fltocKRtRfx55UmmUsnFtFgIZz1F5yCSed0Hg=w22-h23-s-no-gm?authuser=0" alt="icon" /></button>
+    <button id="iconThree"><img src="https://lh3.googleusercontent.com/pw/AP1GczPG2tQ85a5crHpW_wmfY1hYH4nlBLJghbQ0EBNCeW7NLzY4bHXCd-dfnttLkYETXT1Om9VYM2mErg5PS9z9_6nIF-y9GayZVLnf3ijgkFURGV7OW5_24XbTYVsb3TXJ7L6_gekP2wZyWc6i-oY12rA4JQ=w25-h25-s-no-gm?authuser=0" alt="icon" /></button>
     <button id="iconFour">
       <div class="circle" style="width: 25px; height: 25px; background-color: #cb2b9b; border-radius: 50%;"></div>
              </button>
@@ -349,7 +369,6 @@ function injectToolbar() {
   console.log("Toolbar injected");
   setupToolbarInteractions(toolbar);
 }
-
 function setupToolbarInteractions(toolbar) {
   document.addEventListener("click", (event) => {
     const note = event.target.closest(".note-host");
@@ -385,9 +404,8 @@ function setupToolbarInteractions(toolbar) {
 
   toolbar.querySelector("#iconThree").addEventListener("click", () => {
     console.log("Eraser icon clicked");
-    clearStorage();
+    clearStorage(); // Call the updated clearStorage function
   });
-
   const iconFour = document.getElementById("iconFour");
   const colorPicker = document.getElementById("colorPicker");
 
@@ -401,7 +419,6 @@ function setupToolbarInteractions(toolbar) {
     colorPicker.style.width = "30px";
     colorPicker.style.height = "30px";
 
-    // colorPicker.style;
     colorPicker.click();
   });
 
@@ -449,6 +466,106 @@ function setupToolbarInteractions(toolbar) {
     // Handle save icon action
   });
 }
+
+// function setupToolbarInteractions(toolbar) {
+//   document.addEventListener("click", (event) => {
+//     const note = event.target.closest(".note-host");
+//     const iconFour = document.getElementById("iconFour");
+//     const colorPicker = document.querySelector(".color-picker"); // Replace with the actual selector for the color picker
+
+//     if (note) {
+//       selectedNoteId = note.getAttribute("data-note-id");
+//       const noteRect = note.getBoundingClientRect();
+//       toolbar.style.top = `${noteRect.top}px`;
+//       toolbar.style.left = `${
+//         noteRect.left + window.scrollX - toolbar.offsetWidth - 10
+//       }px`;
+//       toolbar.style.display = "flex"; // Show the toolbar
+//       console.log(`Toolbar shown for note ID: ${selectedNoteId}`);
+//     } else if (iconFour.contains(event.target)) {
+//       // Do nothing if the click is on iconFour or the color picker
+//       toolbar.style.display = "flex";
+//     } else {
+//       toolbar.style.display = "none"; // Hide the toolbar if clicked outside
+//     }
+//   });
+
+//   toolbar.querySelector("#iconOne").addEventListener("click", () => {
+//     console.log("Move icon clicked");
+//     // Handle move icon action
+//   });
+
+//   toolbar.querySelector("#iconTwo").addEventListener("click", () => {
+//     console.log("Text icon clicked");
+//     // Handle text icon action
+//   });
+
+//   toolbar.querySelector("#iconThree").addEventListener("click", () => {
+//     console.log("Eraser icon clicked");
+//     clearStorage();
+//   });
+
+//   const iconFour = document.getElementById("iconFour");
+//   const colorPicker = document.getElementById("colorPicker");
+
+//   iconFour.addEventListener("click", () => {
+//     console.log("Circle icon clicked");
+
+//     // Make sure the colorPicker is visible
+//     colorPicker.style.display = "block"; // Ensure it is visible
+//     colorPicker.style.position = "absolute";
+//     colorPicker.style.borderRadius = "50%";
+//     colorPicker.style.width = "30px";
+//     colorPicker.style.height = "30px";
+
+//     // colorPicker.style;
+//     colorPicker.click();
+//   });
+
+//   // Change the circle's background color when the color is picked
+//   colorPicker.addEventListener("input", (event) => {
+//     const selectedColor = event.target.value;
+//     console.log("Color picked:", selectedColor); // For debugging
+
+//     if (selectedNoteId) {
+//       // Find the note with the selectedNoteId
+//       const noteElement = document.querySelector(
+//         `[data-note-id="${selectedNoteId}"]`
+//       );
+//       if (noteElement) {
+//         const shadowRoot = noteElement.shadowRoot;
+//         const noteContent = shadowRoot?.querySelector(".note-content");
+//         if (noteContent) {
+//           noteContent.style.backgroundColor = selectedColor; // Apply the color to the note's inner content
+//         }
+
+//         // Update the note data in the noteList
+//         const note = noteList.find((n) => n.id === selectedNoteId);
+//         if (note) {
+//           note.color = selectedColor; // Update the color in noteList
+//           storeNote(); // Save the changes
+//         }
+//       }
+//     }
+
+//     colorPicker.style.display = "none"; // Hide it again after selecting color
+//   });
+
+//   toolbar.querySelector("#iconFive").addEventListener("click", () => {
+//     console.log("Undo icon clicked");
+//     // Handle undo icon action
+//   });
+
+//   toolbar.querySelector("#iconSix").addEventListener("click", () => {
+//     console.log("Redo icon clicked");
+//     // Handle redo icon action
+//   });
+
+//   toolbar.querySelector("#iconSeven").addEventListener("click", () => {
+//     console.log("Save icon clicked");
+//     // Handle save icon action
+//   });
+// }
 
 // Initialize the toolbar
 injectToolbar();

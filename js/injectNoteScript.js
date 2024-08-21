@@ -41,7 +41,7 @@ function createNoteElement(noteData) {
   noteContent.appendChild(handle);
   const textarea = noteContent.querySelector(".note-content");
   if (textarea) {
-    // textarea.value = noteData.text;
+    textarea.value = noteData.text;
     textarea.style.width = "100%";
     textarea.style.height = "100px";
     textarea.style.backgroundColor = noteData.color;
@@ -132,11 +132,11 @@ function handleCreateNoteRequest(color) {
     position: { top: 100, left: 700 },
     innerhtml: `
 		  <div class="note" style="padding: 10px;">
-			<textarea placeholder="StickIt!" class="note-content"></textarea>
+			<textarea class="note-content"></textarea>
 			<button class="close-note">X</button>
 		  </div>
 		`,
-    // text: "StickIt",
+    text: "StickIt",
     url: new URL(window.location.href).hostname,
   };
   // Inject the toolbar before creating a new note
@@ -166,7 +166,7 @@ function storeNote() {
           ? void 0
           : shadowRoot.querySelector(".note-content");
       if (noteContent) {
-        // note.text = noteContent.value.trim();
+        note.text = noteContent.value.trim();
       }
       const noteRect = noteElement.getBoundingClientRect();
       note.position = {

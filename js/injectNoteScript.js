@@ -128,7 +128,7 @@ function handleCreateNoteRequest(color) {
             </div>
         `,
         text: "StickIt",
-        url: window.location.href,
+        url: new URL(window.location.href).hostname,
     };
     createNewNote(noteData);
     noteList.push(noteData);
@@ -189,9 +189,9 @@ function retrieveNote() {
     console.log("RetrieveNote is running");
     chrome.storage.local.get(null, (result) => {
         const notes = Object.values(result);
-        const currentUrl = window.location.href;
+        const currentHostname = new URL(window.location.href).hostname;
         // Filter notes to only include those that match the current URL
-        const matchingNotes = notes.filter((note) => note.url === currentUrl);
+        const matchingNotes = notes.filter((note) => note.url === currentHostname);
         matchingNotes.forEach((note) => {
             noteList.push(note);
             createNewNote(note);

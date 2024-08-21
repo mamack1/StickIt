@@ -377,7 +377,7 @@ function injectToolbar(): void {
             z-index: 2147483647;
             background-color: #FFFFFF;
             filter: drop-shadow(0 0 0.4rem black);
-            height: 300px;
+            height: 250px;
             width: 45px;
             border-radius: 10px;
             row-gap: 10px;

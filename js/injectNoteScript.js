@@ -32,19 +32,19 @@ function createNoteElement(noteData) {
   const noteContent = document.createElement("div");
   noteContent.innerHTML = noteData.innerhtml.trim();
   noteContent.style.backgroundColor = noteData.color;
-
-  noteContent.style.borderRadius = "5px";
-  noteContent.style.boxShadow = "0 2px 5px rgba(0, 0, 0, 0.3)";
+  noteContent.style.borderRadius = "10px";
+  noteContent.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.15)";
+  noteContent.style.position = "relative";
+  noteContent.style.padding = "10px";
 
   // Handle for dragging
   const handle = document.createElement("div");
-  handle.style.width = "50px";
-  handle.style.height = "5px";
-
-  handle.style.backgroundColor = "grey";
-  handle.style.borderRadius = "10px";
+  handle.style.width = "60px";
+  handle.style.height = "6px";
+  handle.style.backgroundColor = "rgba(0, 0, 0, 0.2)";
+  handle.style.borderRadius = "3px";
   handle.style.position = "absolute";
-  handle.style.top = "5px";
+  handle.style.top = "8px";
   handle.style.left = "50%";
   handle.style.transform = "translateX(-50%)";
   handle.style.cursor = "grab";
@@ -58,14 +58,14 @@ function createNoteElement(noteData) {
     textarea.style.height = "120px";
     textarea.style.backgroundColor = noteData.color;
     textarea.style.border = "none";
-    textarea.style.position = "absolute";
-
+    textarea.style.position = "relative";
     textarea.style.resize = "none";
-    noteContent.style.margin = "5px";
-    noteContent.style.marginBottom = "0px";
+    textarea.style.marginTop = "30px"; // Adjust this to leave space for the handle
     textarea.style.borderRadius = "10px";
     textarea.style.outline = "none";
     textarea.style.color = "black";
+    textarea.style.padding = "10px";
+    textarea.style.boxSizing = "border-box";
     textarea.addEventListener("input", () => {
       storeNote();
     });
@@ -75,15 +75,19 @@ function createNoteElement(noteData) {
   const closeButton = noteContent.querySelector(".close-note");
   if (closeButton) {
     closeButton.style.position = "absolute";
-    closeButton.style.top = "5px";
-    closeButton.style.right = "10px";
-    closeButton.style.backgroundColor = "red";
+    closeButton.style.top = "8px";
+    closeButton.style.right = "8px";
+    closeButton.style.backgroundColor = "#ff4d4d"; // Slightly softer red
     closeButton.style.color = "white";
     closeButton.style.border = "none";
     closeButton.style.borderRadius = "50%";
-    closeButton.style.width = "20px";
-    closeButton.style.height = "20px";
+    closeButton.style.width = "18px";
+    closeButton.style.height = "18px";
     closeButton.style.cursor = "pointer";
+    closeButton.style.fontSize = "12px";
+    closeButton.style.display = "flex";
+    closeButton.style.alignItems = "center";
+    closeButton.style.justifyContent = "center";
   }
 
   shadowRoot.appendChild(noteContent);

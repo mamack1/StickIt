@@ -198,11 +198,8 @@ function retrieveNote() {
     chrome.storage.local.get(null, (result) => {
         const notes = Object.values(result);
         const currentHostname = new URL(window.location.href).hostname;
-<<<<<<< HEAD
-=======
         // Inject the toolbar before interacting with notes
         injectToolbar();
->>>>>>> mikekhaytoolbar
         // Filter notes to only include those that match the current URL
         const matchingNotes = notes.filter((note) => note.url === currentHostname);
         matchingNotes.forEach((note) => {

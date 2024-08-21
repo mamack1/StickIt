@@ -119,8 +119,9 @@ function makeDraggable(handle, noteHost) {
       const newY = event.clientY - offsetY + window.scrollY;
       noteHost.style.left = `${newX}px`;
       noteHost.style.top = `${newY}px`;
+      // Update the toolbar position while dragging
       if (selectedNoteId === noteHost.getAttribute("data-note-id")) {
-        showToolbar(noteHost, true);
+        showToolbar(noteHost);
       }
     }
   });
@@ -128,6 +129,7 @@ function makeDraggable(handle, noteHost) {
     if (isDragging) {
       isDragging = false;
       handle.style.cursor = "grab";
+      // Update the toolbar position after dragging ends
       showToolbar(noteHost);
       storeNote();
     }
@@ -254,12 +256,6 @@ function clearStorage() {
         console.log(`Note element with ID: ${note.id} not found in DOM.`);
       }
     });
-    // Remove the toolbar element from the DOM
-    const toolbarHost = document.querySelector(".toolbar-host");
-    if (toolbarHost) {
-      document.body.removeChild(toolbarHost);
-      console.log("Toolbar removed from DOM.");
-    }
     // Update the noteList array to exclude the cleared notes
     noteList = noteList.filter((note) => note.url !== currentUrl);
     console.log(`Updated noteList:`, noteList);
@@ -276,21 +272,14 @@ function clearStorage() {
 }
 // Inject the toolbar into the page
 function injectToolbar() {
-  if (document.querySelector(".toolbar-host")) {
+  if (document.querySelector(".toolbar")) {
     console.log("Toolbar already exists. Skipping injection.");
     return;
   }
-  // Create a host for the shadow DOM
-  const toolbarHost = document.createElement("div");
-  toolbarHost.className = "toolbar-host";
-  toolbarHost.style.position = "absolute";
-  toolbarHost.style.display = "none";
-  toolbarHost.style.zIndex = "2147483647";
-  // Attach shadow DOM to the toolbar host
-  const shadowRoot = toolbarHost.attachShadow({ mode: "open" });
-  // Create the toolbar inside the shadow DOM
   const toolbar = document.createElement("div");
   toolbar.className = "toolbar";
+  toolbar.style.position = "absolute";
+  toolbar.style.display = "none";
   toolbar.innerHTML = `
         <button id="iconOne"><img src="https://lh3.googleusercontent.com/pw/AP1GczN-DpPVU7JHUW8SjuCdo7DGznZVjj7Kjefci_1Mv23meMMoU5MhT3LADKU-uxUtcpY7oEXuxgXxP5l_x30qps5BU6gT3MEqEA2X8ascxKgEH4kXJSu6E6YeRHz6Vljv-qMFOhRoczxnW8aS4j6W_Lvq9A=w28-h28-s-no-gm?authuser=0" alt="icon" /></button>
         <button id="iconTwo"><img src="https://lh3.googleusercontent.com/pw/AP1GczMsy3w6gWVwnjJRZazZig0vllcuCLZ2I7eNq855K2kZ8AF78vQQuLD08JeGPsvnm10di_9r2wr1sEs44zUATv6lJPI0cXEJB89M2BfnDooTO-1F7jDpB7ipZn4Zj8O9o6yI_mrpsHOZmkfQm6bQcan5iA=w20-h21-s-no-gm?authuser=0" alt="icon" /></button>
@@ -303,25 +292,26 @@ function injectToolbar() {
         <button id="iconSix"><img src="https://lh3.googleusercontent.com/pw/AP1GczPyAgWHA6YU862EKjCaMnOOWN1Al0XvYgkI1dF7MHcRerJJLvRAVyg-oyTDNu5O80pZ6JRoVI4J4tOjNM2Ny8yWtdGyEJdGODDISGXFXoOAot2_DOEYtITrfY7Ow9X-TL0o5LsjGGEWuXxmiBfDqm7UFg=w20-h20-s-no-gm?authuser=0" alt="icon" /></button>
         <button id="iconSeven"><img src="https://lh3.googleusercontent.com/pw/AP1GczOXOaZPfVnrtYqqYk_GH8xxcgQmRaT1oZ7uFSUi-sOXuKeLL6VQg24rK8_HfnQLYcXPTraX9Nw3ApjpX-IHZm-7EG4xk9hKZMxyI-AALjz5adj7zNne-aVx8DkKP7xZFfgK9jA0TpTBNoN8I4TDWIoUoQ=w17-h25-s-no-gm?authuser=0" alt="icon" /></button>
     `;
-  shadowRoot.appendChild(toolbar);
-  // Apply isolated styles inside the shadow DOM
+  document.body.appendChild(toolbar);
   const style = document.createElement("style");
   style.innerHTML = `
         .toolbar {
             display: flex;
             flex-direction: column;
+            flex-wrap: nowrap;
             position: absolute;
             z-index: 2147483647;
             background-color: #FFFFFF;
             filter: drop-shadow(0 0 0.4rem black);
-            height: max-content;
-            width: 25px;
+            height: 250px;
+            width: 45px;
             border-radius: 10px;
             row-gap: 10px;
             justify-content: center;
             align-items: center;
-            padding: 10px;
+            padding: 5px;
             transform: scale(0.85);
+			margin-top: -65px;
         }
     
         .toolbar button {
@@ -335,32 +325,25 @@ function injectToolbar() {
             outline: none;
         }
     `;
-  shadowRoot.appendChild(style);
-  document.body.appendChild(toolbarHost);
+  document.head.appendChild(style);
+  console.log("Toolbar injected");
   setupToolbarInteractions(toolbar);
 }
 function setupToolbarInteractions(toolbar) {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e, _f;
   document.addEventListener("click", (event) => {
-    var _a, _b;
     const note = event.target.closest(".note-host");
-    const iconFour =
-      (_a = toolbar.shadowRoot) === null || _a === void 0
-        ? void 0
-        : _a.querySelector("#iconFour");
-    const colorPicker =
-      (_b = toolbar.shadowRoot) === null || _b === void 0
-        ? void 0
-        : _b.querySelector("#colorPicker");
+    const iconFour = document.getElementById("iconFour");
+    const colorPicker = document.querySelector(".color-picker");
     if (note) {
       selectedNoteId = note.getAttribute("data-note-id");
       const noteRect = note.getBoundingClientRect();
-      const toolbarHost = document.querySelector(".toolbar-host");
-      toolbarHost.style.top = `${noteRect.top + window.scrollY}px`;
-      toolbarHost.style.left = `${
-        noteRect.left + window.scrollX - toolbarHost.offsetWidth - 10
+      toolbar.style.top = `${noteRect.top}px`;
+      toolbar.style.left = `${
+        noteRect.left + window.scrollX - toolbar.offsetWidth - 10
       }px`;
-      toolbarHost.style.display = "flex";
+      toolbar.style.display = "flex";
+      console.log(`Toolbar shown for note ID: ${selectedNoteId}`);
     } else if (iconFour.contains(event.target)) {
       toolbar.style.display = "flex";
     } else {
@@ -383,93 +366,75 @@ function setupToolbarInteractions(toolbar) {
         console.log("Eraser icon clicked");
         clearStorage();
       });
-  const iconFour =
-    (_d = toolbar.shadowRoot) === null || _d === void 0
-      ? void 0
-      : _d.querySelector("#iconFour");
-  const colorPicker =
-    (_e = toolbar.shadowRoot) === null || _e === void 0
-      ? void 0
-      : _e.querySelector("#colorPicker");
-  iconFour === null || iconFour === void 0
-    ? void 0
-    : iconFour.addEventListener("click", () => {
-        if (colorPicker) {
-          console.log("Circle icon clicked");
-          colorPicker.style.display = "block";
-          colorPicker.style.position = "absolute";
-          colorPicker.style.borderRadius = "50%";
-          colorPicker.style.width = "30px";
-          colorPicker.style.height = "30px";
-          colorPicker.click();
-        }
-      });
-  colorPicker === null || colorPicker === void 0
-    ? void 0
-    : colorPicker.addEventListener("input", (event) => {
-        const selectedColor = event.target.value;
-        console.log("Color picked:", selectedColor);
-        if (selectedNoteId) {
-          const noteElement = document.querySelector(
-            `[data-note-id="${selectedNoteId}"]`
-          );
-          if (noteElement) {
-            const shadowRoot = noteElement.shadowRoot;
-            if (shadowRoot) {
-              const noteContent = shadowRoot.querySelector(".note-content");
-              if (noteContent) {
-                noteContent.style.backgroundColor = selectedColor;
-              }
-            }
-            const note = noteList.find((n) => n.id === selectedNoteId);
-            if (note) {
-              note.color = selectedColor;
-              storeNote();
-              const noteIndex = noteList.findIndex(
-                (n) => n.id === selectedNoteId
-              );
-              if (noteIndex !== -1) {
-                document.body.removeChild(noteElement);
-                createNewNote(noteList[noteIndex]);
-              }
-            }
+  const iconFour = document.getElementById("iconFour");
+  const colorPicker = document.getElementById("colorPicker");
+  iconFour.addEventListener("click", () => {
+    console.log("Circle icon clicked");
+    colorPicker.style.display = "block";
+    colorPicker.style.position = "absolute";
+    colorPicker.style.borderRadius = "50%";
+    colorPicker.style.width = "30px";
+    colorPicker.style.height = "30px";
+    colorPicker.click();
+  });
+  colorPicker.addEventListener("input", (event) => {
+    const selectedColor = event.target.value;
+    console.log("Color picked:", selectedColor);
+    if (selectedNoteId) {
+      const noteElement = document.querySelector(
+        `[data-note-id="${selectedNoteId}"]`
+      );
+      if (noteElement) {
+        // Access the shadow DOM of the note
+        const shadowRoot = noteElement.shadowRoot;
+        if (shadowRoot) {
+          // Update the note content background color
+          const noteContent = shadowRoot.querySelector(".note-content");
+          if (noteContent) {
+            noteContent.style.backgroundColor = selectedColor;
           }
         }
-        if (colorPicker) {
-          colorPicker.style.display = "none";
+        // Update the color in the note data and save the note
+        const note = noteList.find((n) => n.id === selectedNoteId);
+        if (note) {
+          note.color = selectedColor; // Update the color property of the Note object
+          storeNote(); // Save the updated note
+          // Re-render the note to apply the changes immediately
+          const noteIndex = noteList.findIndex((n) => n.id === selectedNoteId);
+          if (noteIndex !== -1) {
+            // Remove the old note element
+            document.body.removeChild(noteElement);
+            // Create and insert the updated note element
+            createNewNote(noteList[noteIndex]);
+          }
         }
-      });
-  (_f = toolbar.querySelector("#iconFive")) === null || _f === void 0
+      }
+    }
+    colorPicker.style.display = "none";
+  });
+  (_d = toolbar.querySelector("#iconFive")) === null || _d === void 0
     ? void 0
-    : _f.addEventListener("click", () => {
+    : _d.addEventListener("click", () => {
         console.log("Undo icon clicked");
       });
-  (_g = toolbar.querySelector("#iconSix")) === null || _g === void 0
+  (_e = toolbar.querySelector("#iconSix")) === null || _e === void 0
     ? void 0
-    : _g.addEventListener("click", () => {
+    : _e.addEventListener("click", () => {
         console.log("Redo icon clicked");
       });
-  (_h = toolbar.querySelector("#iconSeven")) === null || _h === void 0
+  (_f = toolbar.querySelector("#iconSeven")) === null || _f === void 0
     ? void 0
-    : _h.addEventListener("click", () => {
+    : _f.addEventListener("click", () => {
         console.log("Save icon clicked");
       });
 }
 // Function to show the toolbar next to the selected note
-function showToolbar(noteHost, isDragging = false) {
-  const toolbarHost = document.querySelector(".toolbar-host");
+function showToolbar(noteHost) {
+  const toolbar = document.querySelector(".toolbar");
   const noteRect = noteHost.getBoundingClientRect();
-  const toolbarOffset = 50;
-  const topPosition = noteRect.top + window.scrollY;
-  const leftPosition =
-    noteRect.left + window.scrollX - toolbarHost.offsetWidth - toolbarOffset;
-  toolbarHost.style.top = `${topPosition}px`;
-  if (isDragging) {
-    toolbarHost.style.left = `${leftPosition}px`;
-  } else {
-    requestAnimationFrame(() => {
-      toolbarHost.style.left = `${leftPosition}px`;
-    });
-  }
-  toolbarHost.style.display = "flex";
+  toolbar.style.top = `${noteRect.top + window.scrollY}px`;
+  toolbar.style.left = `${
+    noteRect.left + window.scrollX - toolbar.offsetWidth - 10
+  }px`;
+  toolbar.style.display = "flex";
 }

@@ -132,9 +132,17 @@
 .note_list {
 	height: 85%;
 	width: 85%;
-	background-color: #ebeace;
 	margin-left: 25px;
 	margin-top: 15px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.note-summary:nth-child(even) {
+	background-color: #f0f0f0;
+}
+.note-summary:nth-child(odd) {
+	background-color: #ebeace;
 }
 
 .menu a {
@@ -143,22 +151,43 @@
 	margin-left: 50px;
 }
 
-/* unvisited link */
-a:link {
-	color: black;
+.note-summary {
+	font-size: 15px;
+	padding: 15px;
+	border-radius: 5px;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	word-wrap: break-word;
 }
 
-/* visited link */
+/* Scrollbar styling */
+.note_list::-webkit-scrollbar {
+	width: 12px;
+}
+
+.note_list::-webkit-scrollbar-thumb {
+	background-color: #d4d4d4;
+	border-radius: 10px;
+	border: 3px solid #ebeace;
+}
+
+.note_list::-webkit-scrollbar-thumb:hover {
+	background-color: #b5b5b5;
+}
+
+.note_list::-webkit-scrollbar-track {
+	background-color: #ebeace;
+	border-radius: 10px;
+}
+
+/* Link styles */
+a:link,
 a:visited {
 	color: black;
+	text-decoration: none;
 }
 
-/* mouse over link */
-a:hover {
-	color: white;
-}
-
-/* selected link */
+a:hover,
 a:active {
-	color: black;
+	color: rgb(104, 161, 235);
 }

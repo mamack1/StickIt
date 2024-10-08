@@ -98,7 +98,7 @@ StickIt provides users with the following functionalities:
 
 ## Screenshots
 
-Insert Video Demo
+![Demo](./imgs/demo/StickItDemo.gif)
 
 ---
 

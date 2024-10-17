@@ -20,13 +20,13 @@
 		"default_popup": "pages/popup.html"
 	},
 	"background": {
-		"service_worker": "js/background.js",
+		"service_worker": "dist/background.js",
 		"type": "module"
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["js/content.js"]
+			"js": ["dist/content.js"]
 		}
 	]
 }

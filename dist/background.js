@@ -1,5 +1,6 @@
+"use strict";
 // This function checks the session storage to see if the content script has been injected in the web page
-function getInjectionState(tabId: number): Promise<boolean> {
+function getInjectionState(tabId) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.get([`scriptInjected_${tabId}`], (result) => {
 			if (chrome.runtime.lastError) {
@@ -14,9 +15,8 @@ function getInjectionState(tabId: number): Promise<boolean> {
 		});
 	});
 }
-
 // This function sets the injection state to true
-function setInjectionState(tabId: number, state: boolean): Promise<void> {
+function setInjectionState(tabId, state) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.set({ [`scriptInjected_${tabId}`]: state }, () => {
 			if (chrome.runtime.lastError) {
@@ -28,9 +28,8 @@ function setInjectionState(tabId: number, state: boolean): Promise<void> {
 		});
 	});
 }
-
 // This function removes the ijectionstate from the session storage
-function removeInjectionState(tabId: number): Promise<void> {
+function removeInjectionState(tabId) {
 	return new Promise((resolve, reject) => {
 		chrome.storage.session.remove([`scriptInjected_${tabId}`], () => {
 			if (chrome.runtime.lastError) {
@@ -42,10 +41,9 @@ function removeInjectionState(tabId: number): Promise<void> {
 		});
 	});
 }
-
 // Check and inject script retrieves the injection state of the current tab, if it is injected it returns, if it is not injected
 // it will inject the content script into the page
-function checkAndInjectScript(tabId: number, request: any) {
+function checkAndInjectScript(tabId, request) {
 	getInjectionState(tabId)
 		.then((isInjected) => {
 			if (isInjected) {
@@ -64,7 +62,6 @@ function checkAndInjectScript(tabId: number, request: any) {
 				});
 				return;
 			}
-
 			chrome.scripting
 				.executeScript({
 					target: { tabId: tabId },
@@ -94,7 +91,6 @@ function checkAndInjectScript(tabId: number, request: any) {
 			console.error("Error getting injection state:", error);
 		});
 }
-
 // Event listener that calls create note functions when the createNote message is received, the tabid and the request including the current url is passed to checkandinject, which passes the message to the content script calling the function
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "createNote") {
@@ -116,12 +112,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 								});
 								return;
 							}
-
-							const noteRequest = {
-								...request,
+							const noteRequest = Object.assign(Object.assign({}, request), {
 								url: tab.url,
-							};
-
+							});
 							checkAndInjectScript(tabId, noteRequest);
 							sendResponse({ success: true });
 						});
@@ -139,10 +132,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				console.error("Error querying tabs:", error);
 				sendResponse({ success: false, error });
 			});
-
 		return true;
 	}
-
 	// This request action responds with the url of the current tab
 	if (request.action === "getCurrentTabUrl") {
 		chrome.tabs
@@ -158,14 +149,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				console.error("Error querying tabs:", error);
 				sendResponse({ success: false, error });
 			});
-
 		return true;
 	}
-
 	sendResponse({ success: false, error: "Unknown action" });
 	return true;
 });
-
 // complete is called when the page is done loading. The content script is injected, then retrieve notes is called to display the notes matching the current url, and then the content script is removed
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	if (changeInfo.status === "complete" && tab.url) {
@@ -191,19 +179,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 		);
 	}
 });
-
 // This listener was intended to re-activate the service worker, may not be necesarry
 chrome.action.onClicked.addListener(() => {
 	console.log("Extension icon clicked, activating service worker.");
 	chrome.runtime.sendMessage({ action: "keepAlive" });
 });
-
 //popup check
 // background.js
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.storage.session.set({ popupShown: false });
 });
-
 chrome.action.onClicked.addListener(() => {
 	chrome.storage.session.get("popupShown", (result) => {
 		if (result.popupShown) {

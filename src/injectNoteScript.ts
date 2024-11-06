@@ -180,17 +180,27 @@ function handleCreateNoteRequest(color: string): void {
 	noteList.push(noteData);
 	storeNote();
 }
+interface Window {
+	hasCreateNoteListener?: boolean;
+}
 
-chrome.runtime.onMessage.addListener(
-	(request: any, sender: any, sendResponse: any) => {
-		if (request.action === "createNote") {
-			handleCreateNoteRequest(request.color);
-			console.log("New Note Injected");
-			sendResponse({ success: true });
-			return true;
+// Ensure listener is only added once by setting a flag
+if (!window.hasCreateNoteListener) {
+	// Set flag to true to prevent future re-registrations
+	window.hasCreateNoteListener = true;
+
+	// Message listener to handle note creation
+	chrome.runtime.onMessage.addListener(
+		(request: any, sender: any, sendResponse: any) => {
+			if (request.action === "createNote") {
+				handleCreateNoteRequest(request.color);
+				console.log("New Note Injected");
+				sendResponse({ success: true });
+				return true;
+			}
 		}
-	}
-);
+	);
+}
 
 /**
  * Storage Functions below

@@ -68,7 +68,7 @@ function checkAndInjectScript(tabId: number, request: any) {
 			chrome.scripting
 				.executeScript({
 					target: { tabId: tabId },
-					files: ["dist/injectNoteScript.js"],
+					files: ["injectNoteScript.bundle.js"],
 				})
 				.then(() => {
 					console.log(`Script injected into tab ${tabId}`);
@@ -172,7 +172,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 		chrome.scripting.executeScript(
 			{
 				target: { tabId },
-				files: ["dist/injectNoteScript.js"],
+				files: ["injectNoteScript.bundle.js"],
 			},
 			() => {
 				chrome.tabs.sendMessage(tabId, { action: "retrieveNote" }, () => {
@@ -208,7 +208,7 @@ chrome.action.onClicked.addListener(() => {
 	chrome.storage.session.get("popupShown", (result) => {
 		if (result.popupShown) {
 			// If the popup has been shown in this session, open the dashboard directly
-			chrome.tabs.create({ url: "pages/dashboard.html" });
+			chrome.tabs.create({ url: "../pages/dashboard.html" });
 		} else {
 			// If the popup hasn't been shown, show the popup and set the flag
 			chrome.storage.session.set({ popupShown: true });

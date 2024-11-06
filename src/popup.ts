@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	chrome.storage.session.get("popupShown", (result: { [key: string]: any }) => {
 		if (result.popupShown) {
 			// If the popup has been shown, redirect immediately
-			window.location.href = "dashboard.html";
+			window.location.href = "../pages/dashboard.html";
 		} else {
 			const numberOfNotes = 10; // Adjust the number of notes as needed
 			const splashBot = document.getElementById("sp_bot") as HTMLElement | null;
@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
 				splashBot.addEventListener("animationend", () => {
 					body.classList.add("fade-out");
 					setTimeout(() => {
-						window.location.href = "dashboard.html";
-					}, 1000); // 1-second delay
+						window.location.href = "../pages/dashboard.html";
+					}, 500); // 1-second delay
 				});
 			}
 

@@ -1,6 +1,6 @@
 # StickIt - Chrome Extension
 
-<img src="imgs/icon.png" width="250">
+<img src="public/icons/icon.png" width="250">
 
 **StickIt** is a Chrome extension developed as part of the TechWise software engineering capstone project. The extension offers a seamless, in-browser sticky note system to help users take notes and organize information while browsing the web.
 

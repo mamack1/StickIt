@@ -1,0 +1,26 @@
+{
+	"manifest_version": 3,
+	"name": "StickIt",
+	"description": "StickIt Notes for the browser",
+	"version": "1.0",
+	"icons": {
+		"16": "icons/icon.png",
+		"48": "icons/icon.png",
+		"128": "icons/icon.png"
+	},
+	"permissions": ["storage", "activeTab", "scripting", "tabs"],
+	"host_permissions": ["<all_urls>"],
+	"action": {
+		"default_icon": {
+			"16": "icons/icon.png",
+			"48": "icons/icon.png",
+			"128": "icons/icon.png"
+		},
+		"default_title": "StickIt",
+		"default_popup": "pages/popup.html"
+	},
+	"background": {
+		"service_worker": "background.bundle.js",
+		"type": "module"
+	}
+}

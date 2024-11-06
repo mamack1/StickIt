@@ -1,9 +1,20 @@
-// DOMContentLoaded Event listener establishes note buttons in order to retrieve color of the note selected, then current url and proceeds to send the createNote message including those two parameters
+// Global variable to store the click event handler reference
+let clickEventListener: ((event: MouseEvent) => void) | null = null;
+
+// DOMContentLoaded Event listener establishes note buttons in order to retrieve color of the note selected,
+// then current url and proceeds to send the createNote message including those two parameters
 document.addEventListener("DOMContentLoaded", () => {
 	const noteParent = document.getElementById("noteParent");
 
 	if (noteParent) {
-		function handleClick(event: MouseEvent) {
+		// Remove any existing event listener to prevent duplication
+		if (clickEventListener) {
+			noteParent.removeEventListener("click", clickEventListener);
+			clickEventListener = null; // Reset the reference to avoid multiple bindings
+		}
+
+		// Define the click handler function
+		clickEventListener = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
 
 			if (target.matches(".createNoteBtn")) {
@@ -21,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
 								{ action: "createNote", color: color, url: currentUrl },
 								(response) => {
 									if (response.success) {
+										console.log("Event listener triggered!!!");
+										console.log("Note created successfully.");
 									} else {
 										console.error("Error creating note:", response.error);
 									}
@@ -32,12 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
 					}
 				);
 			}
-		}
+		};
 
-		// Eventlistener removed and added in order to prevent the eventlistener from stacking, which caused multiple note creations on click
-		noteParent.removeEventListener("click", handleClick);
-
-		noteParent.addEventListener("click", handleClick);
+		// Add the event listener again, ensuring it's only added once
+		noteParent.addEventListener("click", clickEventListener);
 	} else {
 		console.error("Parent container not found");
 	}

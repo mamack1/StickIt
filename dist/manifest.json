@@ -3,6 +3,7 @@
 	"name": "StickIt",
 	"description": "StickIt Notes for the browser",
 	"version": "1.0",
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvR3kKSs8dzG0tBYlbZVUt86yZ7sKr/PoNkSgcYl1icFUbbmrfgP+y3gix/wdNzbzVmsNnsA/W0VckWqE8Da2aZnuhATrFHdUj1rP8wj8H5130UvRGmyGgepkDRSXFaXswQh2OYORAzaXp0m943Bva906uysypz7Gn8jnfNAtbVv6uEeoxrYhtDixAatktN79h41OwRjWHfuQIuXA579/pJ1+pYjc6Qb1sqwWoTsdHS2qSdmsG67ebsZX8crXvGZ1twWnwniDXrvK6/VsJYQTiiLI7UButls8PcRZrFZ8E9izIW74w5Ikj7wvxSr0R0OEPedSb7VdjNdWn0yRvDqwEQIDAQAB",
 	"icons": {
 		"16": "icons/icon.png",
 		"48": "icons/icon.png",

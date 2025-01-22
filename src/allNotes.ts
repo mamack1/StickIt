@@ -1,5 +1,5 @@
 function displayNotesSummary(): void {
-	chrome.storage.local.get(null, (result) => {
+	chrome.storage.sync.get(null, (result) => {
 		const notesContainer = document.getElementById("notesContainer");
 
 		if (notesContainer) {

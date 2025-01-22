@@ -109,7 +109,7 @@ function setupCloseButton(noteHost: HTMLElement): void {
 			const noteId = noteHost.getAttribute("data-note-id");
 			if (noteId) {
 				// Remove the note from storage
-				chrome.storage.local.remove(noteId, () => {
+				chrome.storage.sync.remove(noteId, () => {
 					console.log(`Note id: ${noteId} removed from storage.`);
 				});
 				// Remove the note from the page
@@ -232,7 +232,7 @@ function convertNoteToJson(): void {
 	noteList.forEach((note) => {
 		notesObject[note.id] = note;
 	});
-	chrome.storage.local.set(notesObject, () => {
+	chrome.storage.sync.set(notesObject, () => {
 		console.log("Notes have been saved:", notesObject);
 	});
 }
@@ -254,7 +254,7 @@ chrome.runtime.onMessage.addListener(
 
 function retrieveNote(): void {
 	console.log("RetrieveNote is running");
-	chrome.storage.local.get(null, (result) => {
+	chrome.storage.sync.get(null, (result) => {
 		const notes = Object.values(result) as Note[];
 		const currentHostname = new URL(window.location.href).hostname;
 		// Inject the toolbar before interacting with notes
@@ -305,7 +305,7 @@ function clearStorage(): void {
 		console.log(`Updated noteList:`, noteList);
 		// Remove the notes from Chrome local storage
 		const noteIdsToRemove = notesToClear.map((note) => note.id);
-		chrome.storage.local.remove(noteIdsToRemove, () => {
+		chrome.storage.sync.remove(noteIdsToRemove, () => {
 			console.log("All notes for this page cleared from storage.");
 			// Store the updated noteList
 			convertNoteToJson();
